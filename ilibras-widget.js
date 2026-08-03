@@ -8,7 +8,7 @@
     title: 'iLibras',
     message: 'Olá, somos a equipe iLibras e estamos aqui para ajudar você! 😊',
     buttonText: 'Iniciar atendimento em Libras',
-    token: 'a0673a0159b56e4d1b4156f3d6db5df91773bb136960194db479f0bb3282217b',
+    token: '',
     zIndex: 9999
   };
 
@@ -235,10 +235,12 @@ createWidget() {
         formData.append('nome', nome);
         formData.append('cpf', cpf);
         formData.append('telefone', telefone);
-        formData.append('token', this.config.token);
 
-        const response = await fetch('https://sistema.ilibras.com.br/administrativo/api/clientes/cadastrar.php', {
+        const response = await fetch('https://sistema.ilibras.com.br/api/public/widget/cadastrar', {
           method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.config.token}`
+          },
           body: formData
         });
 
