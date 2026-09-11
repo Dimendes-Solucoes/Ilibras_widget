@@ -41,6 +41,11 @@
 /* Botão flutuante (apenas ícone) */
 .ilibras-widget-button {
   position: relative;
+  border: none;
+  font: inherit;
+  color: inherit;
+  -webkit-appearance: none;
+  appearance: none;
   /* ajustar ao tamanho do próprio ícone */
   width: auto;
   height: auto;
@@ -167,7 +172,7 @@
 }
 
 .ilibras-widget-title {
-  padding-left: 100px;
+  padding-left: 0;
   font-size: 17px;
   font-weight: 700;
   letter-spacing: -0.2px;
@@ -253,7 +258,7 @@
 
 .ilibras-widget-form-group input[type="text"]::placeholder,
 .ilibras-widget-form-group input[type="tel"]::placeholder {
-  color: #adb5bd;
+  color: #6c757d;
 }
 
 /* Checkbox customizado */
@@ -384,14 +389,7 @@
   animation: ilibras-slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Estados de erro */
-.ilibras-widget-form-group input:invalid:not(:placeholder-shown) {
-  border-color: #dc3545;
-}
-
-.ilibras-widget-form-group input:valid:not(:placeholder-shown) {
-  border-color: #28a745;
-}
+/* Estados de erro: ver o bloco de acessibilidade no fim do arquivo. */
 
 /* Accessibilidade */
 .ilibras-widget-button:focus-visible,
@@ -434,5 +432,235 @@
 
   .ilibras-widget-checkbox-label {
     color: #b0b0b0;
+  }
+}
+
+
+/* ─── Acessibilidade e estados ──────────────────────────────────────────────
+   O público deste widget é surdo, e boa parte navega por teclado e leitor de
+   tela. O que segue existe para isso: texto que só o leitor de tela lê, erro
+   ligado ao campo que o causou, foco sempre visível e movimento opcional.
+*/
+
+/* Visível só para leitor de tela. Não usa display:none — o que some da tela
+   dessa forma some também da leitura. */
+.ilibras-widget-sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Armadilha do anti-robô: fora da tela e fora da leitura, mas presente no DOM
+   (bot que ignora display:none continua encontrando e preenchendo). */
+.ilibras-widget-hp {
+  position: absolute !important;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* O diálogo fechado não pode receber foco: com hidden, nada dentro dele entra
+   na ordem de tabulação. */
+.ilibras-widget-modal[hidden] {
+  display: none !important;
+}
+
+.ilibras-widget-legenda {
+  font-size: 12px;
+  color: #495057;
+  margin: 0 0 -8px 4px;
+}
+
+.ilibras-widget-dica {
+  font-size: 12px;
+  color: #495057;
+  padding-left: 4px;
+}
+
+.ilibras-widget-erro {
+  font-size: 13px;
+  font-weight: 500;
+  color: #b02a37;
+  padding-left: 4px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+/* A cor não pode ser o único sinal de erro: quem não distingue vermelho
+   precisa do símbolo e do texto. */
+.ilibras-widget-erro::before {
+  content: "\26A0";
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.ilibras-widget-erro[hidden] {
+  display: none;
+}
+
+.ilibras-widget-form-group input.ilibras-widget-invalido {
+  border-color: #b02a37;
+  border-width: 2px;
+}
+
+/* Aviso de falha de serviço / limite de uso. */
+.ilibras-widget-aviso {
+  background: #fdf2f2;
+  border: 1px solid #f0c2c2;
+  border-left: 4px solid #b02a37;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  color: #6b1d24;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.ilibras-widget-aviso[hidden] {
+  display: none;
+}
+
+.ilibras-widget-aviso:focus-visible {
+  outline: 3px solid #b02a37;
+  outline-offset: 2px;
+}
+
+.ilibras-widget-aviso-texto {
+  margin: 0;
+}
+
+/* Plano de contingência: aparece quando a API não responde. */
+.ilibras-widget-fallback {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #f0c2c2;
+  font-size: 13px;
+}
+
+.ilibras-widget-fallback p {
+  margin: 0 0 6px;
+}
+
+.ilibras-widget-fallback ul {
+  margin: 0;
+  padding-left: 18px;
+  list-style: disc;
+}
+
+.ilibras-widget-fallback li {
+  margin: 2px 0;
+}
+
+.ilibras-widget-fallback a {
+  color: #1f4f7a;
+  font-weight: 600;
+}
+
+.ilibras-widget-status {
+  font-size: 13px;
+  color: #495057;
+  margin: 0;
+  min-height: 1em;
+}
+
+/* Foco visível em tudo que recebe foco, inclusive campos — o :focus original
+   trocava a sombra, que some em alto contraste. */
+.ilibras-widget-button:focus-visible,
+.ilibras-widget-close:focus-visible,
+.ilibras-widget-submit:focus-visible,
+.ilibras-widget-form-group input:focus-visible,
+.ilibras-widget-checkbox-label input:focus-visible,
+.ilibras-widget-fallback a:focus-visible {
+  outline: 3px solid #1f4f7a;
+  outline-offset: 2px;
+}
+
+/* Windows em alto contraste remove cor de fundo e borda sutil: sem isto o
+   campo e o botão ficam sem contorno. */
+@media (forced-colors: active) {
+  .ilibras-widget-modal,
+  .ilibras-widget-form-group input,
+  .ilibras-widget-submit,
+  .ilibras-widget-aviso {
+    border: 1px solid CanvasText;
+  }
+
+  .ilibras-widget-button:focus-visible,
+  .ilibras-widget-close:focus-visible,
+  .ilibras-widget-submit:focus-visible,
+  .ilibras-widget-form-group input:focus-visible {
+    outline: 3px solid Highlight;
+  }
+}
+
+/* Quem pediu menos movimento no sistema não deve receber animação: para parte
+   das pessoas com sensibilidade vestibular, isso causa mal-estar. */
+@media (prefers-reduced-motion: reduce) {
+  #ilibras-widget-container,
+  .ilibras-widget-modal,
+  .ilibras-widget-submit,
+  .ilibras-widget-close,
+  .ilibras-widget-badge {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .ilibras-widget-submit:hover,
+  .ilibras-widget-close:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .ilibras-widget-legenda,
+  .ilibras-widget-dica,
+  .ilibras-widget-status {
+    color: #c9c9c9;
+  }
+
+  .ilibras-widget-erro {
+    color: #ff9aa2;
+  }
+
+  .ilibras-widget-form-group input.ilibras-widget-invalido {
+    border-color: #ff9aa2;
+  }
+
+  .ilibras-widget-aviso {
+    background: #3a2224;
+    border-color: #6b3a3f;
+    border-left-color: #ff9aa2;
+    color: #ffd9dc;
+  }
+
+  .ilibras-widget-fallback {
+    border-top-color: #6b3a3f;
+  }
+
+  .ilibras-widget-fallback a {
+    color: #9ecbff;
+  }
+
+  .ilibras-widget-title {
+    color: #e6f0f8;
+  }
+
+  .ilibras-widget-header {
+    background: #1e1e1e;
+    border-left-color: #333;
+    border-bottom-color: #333;
+  }
+
+  .ilibras-widget-close {
+    color: #e0e0e0;
   }
 }

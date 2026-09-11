@@ -91,7 +91,34 @@ new ILibrasWidget({
 | `primaryColor` | `string` | `'#4A90E2'` | Cor principal do widget (hex) |
 | `title` | `string` | `'iLibras'` | Título exibido no cabeçalho |
 | `message` | `string` | `'Olá, somos a equipe...'` | Mensagem de boas-vindas |
-| `buttonText` | `string` | `'Iniciar atendimento'` | Texto do botão de envio || `token` | `string` | `null` | **OBRIGATÓRIO** - Token de autenticação da API || `zIndex` | `number` | `9999` | Z-index do widget |
+| `buttonText` | `string` | `'Iniciar atendimento em Libras'` | Texto do botão de envio |
+| `token` | `string` | `''` | **OBRIGATÓRIO** — token de autenticação da API |
+| `zIndex` | `number` | `9999` | Z-index do widget |
+| `apiUrl` | `string` | endpoint de produção | Endpoint de cadastro. Troque apenas para apontar a um ambiente de homologação |
+| `timeoutMs` | `number` | `15000` | Prazo de cada tentativa. Passado isso a requisição é abortada e a pessoa recebe uma mensagem, em vez de ficar no "Enviando..." |
+| `tentativas` | `number` | `2` | Quantas vezes tentar quando a falha é de rede ou do servidor. Erro de validação e limite de uso nunca são repetidos |
+| `fallback` | `object` | `{}` | Canais alternativos exibidos quando o serviço não responde: `{ telefone, email, url, texto }` |
+
+### Plano de contingência (`fallback`)
+
+Se a API do iLibras não responder, o widget mostra a falha dentro do próprio
+modal e — se você tiver configurado — oferece outro caminho de atendimento, em
+vez de deixar a pessoa sem saída:
+
+```javascript
+new ILibrasWidget({
+  token: 'seu_token_aqui',
+  fallback: {
+    telefone: '(11) 4002-8922',
+    email: 'acessibilidade@suaempresa.com.br',
+    url: 'https://suaempresa.com.br/atendimento',
+    texto: 'Enquanto isso, você pode falar com a gente por aqui:'
+  }
+});
+```
+
+Qualquer combinação dos quatro campos funciona; o bloco só aparece se pelo
+menos um canal estiver preenchido.
 
 ## 📊 Integração com API
 
@@ -339,15 +366,67 @@ O widget valida o CPF antes do envio usando o algoritmo de verificação de díg
 
 ### Validação de Nome
 
-- Requer no mínimo 3 caracteres
-- Remove espaços extras
-- Mesmo valor usado para `nome` e `nome_usuario`
+- Entre 3 e 120 caracteres
+- Apenas letras, espaços, apóstrofos, hífens e pontos — dígito, emoji e
+  pontuação de código são rejeitados
+- Exige nome e sobrenome
+
+### Validação de Telefone
+
+- DDD conferido contra a lista de códigos em uso no país
+- Celular com 9 dígitos precisa começar em 9; fixo com 8 dígitos, entre 2 e 5
+- Sequências repetidas (00000000000) são rejeitadas
 
 ### Sanitização de Dados
 
-Todos os dados são sanitizados antes do envio:
-- CPF: apenas números
-- Nome: trimmed (espaços removidos das extremidades)
+- CPF e telefone: apenas dígitos
+- Nome: espaços das pontas removidos e sequências de espaço reduzidas a um
+
+> **A validação do widget é conveniência, não barreira.** Ela roda no navegador
+> e qualquer pessoa a desliga pelo console. As mesmas regras valem no servidor,
+> e é lá que elas decidem — o widget as repete só para avisar cedo e em
+> português, sem uma ida à rede.
+
+## 🤖 Proteção contra automação
+
+O widget participa de duas checagens simples do lado do servidor:
+
+- **campo-armadilha** (`site_url`): existe no formulário, fica fora da tela e
+  fora da leitura de tela. Só chega preenchido quando quem respondeu foi um
+  programa que preenche todo campo que encontra;
+- **tempo de preenchimento** (`iniciado_em`): o instante em que o modal foi
+  aberto. Envio em menos de 3 segundos é recusado.
+
+Nenhuma das duas é intransponível, e não é o que se espera delas: quem segura
+volume é o limite de requisições por IP e por contrato, aplicado no servidor.
+Elas existem para que o ataque trivial — um `curl` em laço — não chegue até lá.
+
+**Não há CAPTCHA, e isso é deliberado:** o público deste widget é surdo, e
+desafio visual ou de áudio é exatamente a barreira que o produto existe para
+remover.
+
+Se o limite for atingido, a API responde `429` e o widget mostra a mensagem do
+servidor (que já diz quanto esperar) sem repetir a requisição.
+
+## ♿ Acessibilidade
+
+O widget segue as WCAG 2.1 nível AA nos pontos que dependem dele:
+
+- **teclado**: o gatilho é um `<button>` de verdade; o modal é um
+  `role="dialog"` com `aria-modal`, foco levado ao primeiro campo ao abrir,
+  `Tab` preso dentro da janela, `Esc` para fechar e foco devolvido a quem
+  abriu;
+- **leitor de tela**: todo campo tem rótulo associado, `aria-required` e
+  `aria-describedby` ligando dica e mensagem de erro; o estado do envio é
+  anunciado por uma região `aria-live`; falhas de serviço usam `role="alert"`;
+- **erros**: aparecem junto do campo que os causou, com ícone além da cor, e o
+  foco vai para o primeiro campo inválido — nada de `alert()`;
+- **contraste**: textos e mensagens em AA (4.5:1); campo inválido sinalizado por
+  borda mais espessa e símbolo, não só por cor;
+- **preferências do sistema**: `prefers-reduced-motion` desliga as animações e
+  `forced-colors` (alto contraste do Windows) mantém contornos visíveis;
+- **idioma**: o container declara `lang="pt-BR"`, para o leitor de tela usar a
+  voz certa mesmo num site em outro idioma.
 
 ## 🎓 Exemplos Práticos
 

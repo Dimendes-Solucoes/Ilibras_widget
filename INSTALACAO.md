@@ -83,6 +83,22 @@ new ILibrasWidget({
 
 > 📖 **Nota:** O parâmetro `redirectUrl` foi removido. O widget agora abre automaticamente o link da API em nova aba.
 
+### Plano de contingência (recomendado)
+
+Se a API do iLibras não responder, o widget explica a falha dentro do próprio
+modal. Configurando `fallback`, ele também oferece outro caminho de atendimento
+em vez de deixar a pessoa sem saída:
+
+```javascript
+new ILibrasWidget({
+  token: 'seu_token_aqui',
+  fallback: {
+    telefone: '(11) 4002-8922',
+    email: 'acessibilidade@suaempresa.com.br'
+  }
+});
+```
+
 ---
 
 ## Testando Localmente

@@ -1,6 +1,6 @@
 {
   "name": "ilibras-widget",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Widget embarcável para captura de dados e redirecionamento para plataforma de atendimento",
   "main": "ilibras-widget.js",
   "files": [

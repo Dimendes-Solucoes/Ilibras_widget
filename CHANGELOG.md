@@ -4,6 +4,67 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 ---
 
+## [1.2.0] - 2026-09-11
+
+Adequações de segurança e acessibilidade. Nenhuma quebra de contrato com a API:
+integrações existentes continuam funcionando sem alteração.
+
+### ♿ Acessibilidade
+
+- O gatilho flutuante virou `<button>`. Era um `<div>`, ou seja, inalcançável
+  por teclado — quem não usa mouse não conseguia abrir o widget.
+- O modal virou diálogo de verdade: `role="dialog"`, `aria-modal`, rótulo pelo
+  título, foco levado ao primeiro campo ao abrir, `Tab` preso dentro da janela,
+  `Esc` para fechar e foco devolvido a quem abriu.
+- Erros deixaram de usar `alert()`. Agora aparecem junto do campo que os
+  causou, com `aria-invalid`, `aria-describedby` e ícone além da cor, e o foco
+  vai para o primeiro campo inválido.
+- Estado do envio anunciado por região `aria-live`; falhas de serviço por
+  `role="alert"`.
+- Contraste do placeholder e dos textos de apoio ajustado para 4.5:1 (AA).
+- Suporte a `prefers-reduced-motion` e a `forced-colors` (alto contraste).
+- `lang="pt-BR"` no container, para o leitor de tela usar a voz certa em site
+  de outro idioma.
+
+### 🛡️ Indisponibilidade do serviço
+
+- Toda requisição tem prazo (`timeoutMs`, 15s por padrão) e é abortada ao
+  estourá-lo. Antes, uma API que aceitava a conexão e não respondia deixava a
+  pessoa no "Aguarde..." indefinidamente.
+- Falha de rede e erro 5xx ganham uma retentativa com espera; `422` e `429`
+  não são repetidos.
+- Mensagens distintas por causa: sem internet, servidor fora, demora, limite de
+  uso, token inválido, dados inválidos.
+- Nova opção `fallback`: canais alternativos (telefone, e-mail, link) mostrados
+  quando o serviço não responde.
+- Erros de validação vindos da API voltam para os campos certos.
+
+### ✅ Validação
+
+- Nome: 3 a 120 caracteres, só letras e sinais de nome, exige sobrenome.
+- Telefone: DDD conferido contra a lista nacional, 9º dígito de celular e
+  prefixo de fixo validados.
+- CPF: inalterado (algoritmo dos dígitos verificadores).
+
+### 🤖 Proteção contra automação
+
+- Campo-armadilha invisível (`site_url`) e marca de tempo de abertura
+  (`iniciado_em`) enviados junto com o cadastro, para o servidor separar quem
+  digitou de quem disparou um POST.
+- Trava contra envio duplo enquanto uma requisição está em andamento.
+
+### 🐛 Correções
+
+- A logo e a folha de estilo passam a ser resolvidas a partir do endereço do
+  próprio script. Eram caminhos relativos à página do cliente, então só
+  carregavam quando o widget ficava na raiz do site.
+- Textos de configuração (`title`, `message`, `buttonText`) passam a ser
+  escapados antes de ir para o HTML.
+- Se o bloqueador de pop-up impedir a nova aba, a navegação acontece na aba
+  atual em vez de o atendimento se perder.
+
+---
+
 ## [1.1.0] - 2026-02-18
 
 ### 🚀 Mudanças Importantes
