@@ -4,6 +4,42 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 ---
 
+## [1.3.0] - 2026-09-16
+
+### ✨ Agendamento direto pelo widget
+
+- Novo botão no formulário: **Agendar uma conversa**. Quem clica não entra na
+  espera ao vivo — cai direto no calendário do iLibras, escolhe dia e horário e
+  recebe confirmação e lembretes por e-mail.
+
+  O cadastro é o mesmo dos dois lados; o que muda é o campo `modo` enviado
+  (`fila` ou `agendamento`) e, por consequência, o link que o iLibras devolve.
+
+- Quem entra por este botão não passa pela fila ao vivo em momento nenhum: o
+  iLibras já cria o atendimento fora dela. Se a pessoa desistir e voltar para a
+  fila pela própria página, entra no fim — e a página avisa isso antes.
+
+  O aviso de saída da fila só existe para quem já estava esperando e clica em
+  agendar lá. Pelo widget não há aviso: a escolha foi feita antes de existir
+  fila para perder.
+
+- Duas opções novas: `agendamento` (liga e desliga o botão, padrão `true`) e
+  `scheduleButtonText` (o texto dele).
+
+  Desligue com `agendamento: false` no site que só atende ao vivo: um botão que
+  leva a uma agenda que ninguém cobre é pior do que não ter o botão.
+
+### 🔁 Compatibilidade
+
+Nenhuma quebra. Widget já instalado que não for atualizado continua enviando o
+cadastro sem `modo`, e o iLibras trata a ausência como `fila` — exatamente o
+comportamento anterior.
+
+**Requer o iLibras com suporte a `modo` no endpoint do widget.** Sem ele o
+campo é ignorado e o botão de agendar leva à fila, como antes.
+
+---
+
 ## [1.2.0] - 2026-09-11
 
 Adequações de segurança e acessibilidade. Nenhuma quebra de contrato com a API:

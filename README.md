@@ -77,6 +77,8 @@ new ILibrasWidget({
   title: 'iLibras',
   message: 'Olá! Como podemos ajudar?',
   buttonText: 'Iniciar atendimento',
+  agendamento: true,
+  scheduleButtonText: 'Agendar uma conversa',
   token: 'SEU_TOKEN_AQUI',
   zIndex: 9999
 });
@@ -92,6 +94,8 @@ new ILibrasWidget({
 | `title` | `string` | `'iLibras'` | Título exibido no cabeçalho |
 | `message` | `string` | `'Olá, somos a equipe...'` | Mensagem de boas-vindas |
 | `buttonText` | `string` | `'Iniciar atendimento em Libras'` | Texto do botão de envio |
+| `agendamento` | `boolean` | `true` | Mostra o segundo botão, que leva direto à escolha de data e horário em vez da fila ao vivo. Deixe `false` em site que só atende ao vivo |
+| `scheduleButtonText` | `string` | `'Agendar uma conversa'` | Texto do botão de agendamento |
 | `token` | `string` | `''` | **OBRIGATÓRIO** — token de autenticação da API |
 | `zIndex` | `number` | `9999` | Z-index do widget |
 | `apiUrl` | `string` | endpoint de produção | Endpoint de cadastro. Troque apenas para apontar a um ambiente de homologação |

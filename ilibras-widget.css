@@ -317,6 +317,38 @@
   transform: none;
 }
 
+/* Agendar é a segunda escolha, não a concorrente: contorno em vez de preenchido,
+   para a hierarquia entre "agora" e "depois" ficar visível antes da leitura. O
+   form tem gap de 20px; as margens negativas colam o botão na dica que o explica. */
+.ilibras-widget-agendar {
+  padding: 11px 14px !important;
+  border-radius: 10px;
+  font-size: 15px;
+  text-transform: none;
+  letter-spacing: 0.3px;
+  background: transparent;
+  color: #357ABD;
+  border: 1px solid #A9C7E8;
+  cursor: pointer;
+  transition: background 0.14s ease, border-color 0.14s ease, opacity 0.12s;
+  margin-top: -8px;
+}
+
+.ilibras-widget-agendar:hover:not(:disabled) {
+  background: #F2F7FD;
+  border-color: #357ABD;
+}
+
+.ilibras-widget-agendar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ilibras-widget-dica-agendar {
+  margin-top: -14px;
+  text-align: center;
+}
+
 /* Responsividade */
 @media (max-width: 480px) {
   .ilibras-widget-modal {

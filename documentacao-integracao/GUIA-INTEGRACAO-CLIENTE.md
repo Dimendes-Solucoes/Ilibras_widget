@@ -267,6 +267,8 @@ new ILibrasWidget({
   title: 'iLibras',
   message: 'Olá! Como podemos ajudar?',
   buttonText: 'Iniciar atendimento em Libras',
+  agendamento: true,
+  scheduleButtonText: 'Agendar uma conversa',
   zIndex: 9999
 });
 ```
@@ -278,6 +280,8 @@ new ILibrasWidget({
 | `title` | string | `'iLibras'` | Não | Título exibido no cabeçalho do formulário |
 | `message` | string | mensagem padrão de boas-vindas | Não | Texto de boas-vindas exibido no corpo do formulário |
 | `buttonText` | string | `'Iniciar atendimento em Libras'` | Não | Texto do botão de envio |
+| `agendamento` | boolean | `true` | Não | Mostra o botão que leva direto ao agendamento, sem passar pela fila ao vivo |
+| `scheduleButtonText` | string | `'Agendar uma conversa'` | Não | Texto do botão de agendamento |
 | `zIndex` | number | `9999` | Não | Camada de sobreposição (`z-index`) do widget |
 
 > **Nota sobre `redirectUrl`:** essa opção existe por compatibilidade com versões antigas, mas no fluxo atual o redirecionamento é sempre definido pela resposta da API (`link_fila`) — o widget abre esse link automaticamente em nova aba. Não é necessário (nem recomendado) configurar `redirectUrl` em instalações novas.

@@ -24,6 +24,14 @@
     title: 'iLibras',
     message: 'Olá, somos a equipe iLibras e estamos aqui para ajudar você! 😊',
     buttonText: 'Iniciar atendimento em Libras',
+
+    // Segunda saída do formulário: em vez de entrar na fila ao vivo, a pessoa
+    // cai direto no calendário e marca dia e hora. Desligue com
+    // `agendamento: false` no site que só atende ao vivo — um botão que leva a
+    // uma agenda que ninguém cobre é pior do que não ter o botão.
+    agendamento: true,
+    scheduleButtonText: 'Agendar uma conversa',
+
     token: '',
     zIndex: 9999,
 
@@ -197,6 +205,18 @@
                 ${this.escapar(this.config.buttonText)}
               </button>
 
+              ${this.config.agendamento ? `
+              <!-- type="button" de propósito: Enter dentro de um campo aciona o
+                   primeiro submit do formulário, e quem digitou e apertou Enter
+                   quis o atendimento agora, não a agenda. -->
+              <button type="button" id="ilibras-widget-agendar" class="ilibras-widget-agendar"
+                      aria-describedby="ilibras-widget-agendar-dica">
+                ${this.escapar(this.config.scheduleButtonText)}
+              </button>
+              <span class="ilibras-widget-dica ilibras-widget-dica-agendar" id="ilibras-widget-agendar-dica">
+                Escolha data e horário em vez de esperar na fila.
+              </span>` : ''}
+
               <!-- Estado do envio, anunciado sem roubar o foco de quem digita. -->
               <p class="ilibras-widget-status" id="ilibras-widget-status" role="status" aria-live="polite"></p>
             </form>
@@ -211,6 +231,7 @@
       this.modal = container.querySelector('#ilibras-widget-modal');
       this.form = container.querySelector('#ilibras-widget-form');
       this.submit = container.querySelector('#ilibras-widget-submit');
+      this.agendar = container.querySelector('#ilibras-widget-agendar');
       this.aviso = container.querySelector('#ilibras-widget-aviso');
       this.status = container.querySelector('#ilibras-widget-status');
     }
@@ -252,7 +273,11 @@
       this.container.querySelector('#ilibras-consent')
         .addEventListener('change', () => this.limparErro('consent'));
 
-      this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+      this.form.addEventListener('submit', (e) => this.handleSubmit(e, 'fila'));
+
+      if (this.agendar) {
+        this.agendar.addEventListener('click', (e) => this.handleSubmit(e, 'agendamento'));
+      }
     }
 
     prenderFoco(evento) {
@@ -536,7 +561,12 @@
 
     // ─── Envio ──────────────────────────────────────────────────────────────
 
-    async handleSubmit(e) {
+    /**
+     * @param {string} modo 'fila' entra na espera ao vivo; 'agendamento' leva a
+     *   pessoa direto ao calendário. O cadastro é o mesmo nos dois — o que muda
+     *   é para onde o iLibras devolve o link.
+     */
+    async handleSubmit(e, modo = 'fila') {
       e.preventDefault();
 
       // Barra o clique duplo e o envio em rajada — antes do servidor precisar
@@ -568,8 +598,9 @@
       corpo.append('telefone', v.telefone);
       corpo.append('site_url', v.honeypot);
       corpo.append('iniciado_em', String(this.abertoEm || Date.now()));
+      corpo.append('modo', modo);
 
-      this.travarEnvio(true);
+      this.travarEnvio(true, modo);
 
       try {
         const resultado = await this.enviarComRetentativa(corpo);
@@ -577,7 +608,9 @@
 
         if (!destino) throw new FalhaDeServico('resposta_inesperada');
 
-        this.anunciar('Atendimento criado. Abrindo a sala de atendimento.');
+        this.anunciar(modo === 'agendamento'
+          ? 'Cadastro feito. Abrindo o calendário para escolher data e horário.'
+          : 'Atendimento criado. Abrindo a sala de atendimento.');
 
         // window.open depois de await pode cair no bloqueador de pop-up. Se
         // cair, a mesma aba leva — melhor trocar de página do que sumir com o
@@ -590,15 +623,30 @@
       } catch (erro) {
         this.tratarFalha(erro);
       } finally {
-        this.travarEnvio(false);
+        // O mesmo modo da ida: sem ele, destravar devolveria o texto ao botão
+        // errado e o acionado ficaria em "Enviando..." para sempre.
+        this.travarEnvio(false, modo);
       }
     }
 
-    travarEnvio(travado) {
+    travarEnvio(travado, modo = 'fila') {
       this.enviando = travado;
-      this.submit.disabled = travado;
-      this.submit.setAttribute('aria-busy', travado ? 'true' : 'false');
-      this.submit.textContent = travado ? 'Enviando...' : this.config.buttonText;
+
+      // Os dois botões saem de cena: enquanto um cadastro está em curso, o
+      // outro caminho criaria um segundo atendimento para a mesma pessoa.
+      for (const botao of [this.submit, this.agendar]) {
+        if (botao) botao.disabled = travado;
+      }
+
+      // Só o botão acionado muda de texto e recebe aria-busy — dizer que o
+      // outro está ocupado seria mentira para quem usa leitor de tela.
+      const usouAgendar = modo === 'agendamento' && this.agendar;
+      const ativo = usouAgendar ? this.agendar : this.submit;
+      const rotulo = usouAgendar ? this.config.scheduleButtonText : this.config.buttonText;
+
+      ativo.setAttribute('aria-busy', travado ? 'true' : 'false');
+      ativo.textContent = travado ? 'Enviando...' : rotulo;
+
       if (travado) this.anunciar('Enviando seus dados. Aguarde.');
     }
 
