@@ -22,17 +22,87 @@ Widget embarcável similar ao WhatsApp para captura de dados (Nome e CPF) com in
 
 ## 📦 Instalação
 
-### Opção 1: Instalação Manual
+O widget é um arquivo só: estilo e logo vão embutidos. Não há CSS nem imagem
+para baixar junto, e não há caminho para configurar errado.
 
-1. Baixe os arquivos:
-   - `ilibras-widget.js`
-   - `ilibras-widget.css`
+> ⚠️ Em qualquer uma das opções, troque `SEU_TOKEN_AQUI` pelo token que a
+> equipe iLibras forneceu para o contrato.
 
-2. Adicione ao seu HTML antes de `</body>`:
+### Opção 1: npm
+
+Para projetos com bundler — React, Vue, Svelte, Next, Nuxt, Astro, Vite,
+webpack:
+
+```bash
+npm i ilibras-widget
+```
+
+```js
+import ILibrasWidget from 'ilibras-widget';
+
+const widget = new ILibrasWidget({ token: 'SEU_TOKEN_AQUI' });
+```
+
+Importar não cria widget nenhum — quem decide quando instanciar é você. Isso é
+o que permite usar o pacote em projeto com renderização no servidor, onde o
+import acontece onde não existe `document`.
+
+O pacote traz tipos TypeScript; não é preciso instalar `@types`.
+
+#### React
+
+```jsx
+import { useEffect } from 'react';
+import ILibrasWidget from 'ilibras-widget';
+
+export function Acessibilidade() {
+  useEffect(() => {
+    const widget = new ILibrasWidget({ token: 'SEU_TOKEN_AQUI' });
+    // Sem isto, cada montagem deixa um widget para trás e o site acumula
+    // botões flutuantes.
+    return () => widget.destroy();
+  }, []);
+
+  return null;
+}
+```
+
+#### Vue
+
+```vue
+<script setup>
+import { onMounted, onBeforeUnmount } from 'vue';
+import ILibrasWidget from 'ilibras-widget';
+
+let widget;
+onMounted(() => { widget = new ILibrasWidget({ token: 'SEU_TOKEN_AQUI' }); });
+onBeforeUnmount(() => widget?.destroy());
+</script>
+```
+
+### Opção 2: Via CDN
+
+Sem build, sem instalar nada. A versão fica presa na URL — atualizar é trocar
+o número:
 
 ```html
-<!-- iLibras Widget -->
-<link rel="stylesheet" href="ilibras-widget.css">
+<script src="https://cdn.jsdelivr.net/npm/ilibras-widget@1/dist/ilibras-widget.js"></script>
+<script>
+  new ILibrasWidget({
+    token: 'SEU_TOKEN_AQUI'
+  });
+</script>
+```
+
+Use `@1` para receber correções automaticamente, ou fixe a versão exata
+(`@1.4.0`) se preferir controlar cada atualização.
+
+### Opção 3: Arquivo baixado
+
+Para WordPress, HTML solto e qualquer site sem build. Baixe
+[`ilibras-widget.js`](ilibras-widget.js) e hospede junto do seu site:
+
+```html
 <script src="ilibras-widget.js"></script>
 <script>
   new ILibrasWidget({
@@ -41,18 +111,20 @@ Widget embarcável similar ao WhatsApp para captura de dados (Nome e CPF) com in
 </script>
 ```
 
-> ⚠️ **IMPORTANTE:** Substitua `SEU_TOKEN_AQUI` pelo token fornecido pela equipe iLibras.
+> Instalações antigas incluíam também um `<link rel="stylesheet">` para
+> `ilibras-widget.css`. A partir da v1.4.0 o estilo vai dentro do JavaScript e
+> essa linha virou desnecessária — mas deixá-la não quebra nada.
 
-### Opção 2: Via CDN (quando disponível)
+### Instalação sem escrever JavaScript
+
+Em qualquer uma das opções com `<script>`, dá para configurar o widget antes
+de carregá-lo, e ele se cria sozinho:
 
 ```html
-<link rel="stylesheet" href="https://cdn.example.com/ilibras-widget.css">
-<script src="https://cdn.example.com/ilibras-widget.js"></script>
 <script>
-  new ILibrasWidget({
-    token: 'SEU_TOKEN_AQUI'
-  });
+  window.iLibrasWidgetConfig = { token: 'SEU_TOKEN_AQUI' };
 </script>
+<script src="https://cdn.jsdelivr.net/npm/ilibras-widget@1/dist/ilibras-widget.js"></script>
 ```
 
 ## 🚀 Uso Rápido
@@ -530,32 +602,76 @@ export default {
 ## 📄 Estrutura de Arquivos
 
 ```
-Ilibras-embedded/
-├── ilibras-widget.js      # Script principal do widget
-├── ilibras-widget.css     # Estilos do widget
-├── exemplo.html           # Página de exemplo e demonstração
-└── README.md              # Esta documentação
+Ilibras_widget/
+├── src/                     # A fonte — é aqui que se mexe
+│   ├── ILibrasWidget.js     #   a classe
+│   ├── index.js             #   entrada do pacote npm
+│   ├── navegador.js         #   entrada da build de <script>
+│   └── assets-gerados.js    #   GERADO: css e logo embutidos
+├── scripts/
+│   ├── gerar-assets.mjs     # css + svg  ->  src/assets-gerados.js
+│   └── build.mjs            # src/  ->  dist/ e raiz
+├── tests/                   # npm test
+├── ilibras-widget.css       # Estilo (fonte do embutido)
+├── ilibras-LOGO.svg         # Logo (fonte do embutido)
+├── ilibras-widget.js        # GERADO: build de <script>, no endereço de sempre
+├── index.d.ts               # Tipos TypeScript
+├── exemplo.html             # Página de exemplo e demonstração
+└── README.md                # Esta documentação
 ```
+
+## 🛠️ Desenvolvimento
+
+```bash
+npm install     # só o esbuild
+npm run build   # gera dist/ e o ilibras-widget.js da raiz
+npm test        # garante que estilo e logo saíram embutidos nas três builds
+```
+
+> ⚠️ **Não edite `ilibras-widget.js` na raiz nem `src/assets-gerados.js`.** Os
+> dois são gerados e sobrescritos pelo build. A lógica vive em
+> `src/ILibrasWidget.js`; o visual, em `ilibras-widget.css`.
+
+O `ilibras-widget.js` da raiz é versionado de propósito, mesmo sendo gerado:
+sites já instalados apontam para esse caminho e o README manda baixá-lo de lá.
+Mudar o endereço quebraria justamente quem não usa npm.
+
+### Publicando no npm
+
+`prepublishOnly` roda o build sozinho, então basta:
+
+```bash
+npm version minor    # ou patch / major
+npm publish
+```
+
+Confira o conteúdo antes com `npm pack --dry-run`.
 
 ## 🐛 Solução de Problemas
 
 ### Widget não aparece
 
-1. Verifique se ambos os arquivos (CSS e JS) foram carregados
-2. Verifique o console do navegador para erros
-3. Certifique-se de que os caminhos dos arquivos estão corretos
+1. Confira se o script carregou (aba Network do navegador)
+2. Veja o console: sem `token`, o widget avisa ao tentar enviar
+3. Usando bundler? Lembre que `import` não cria o widget — é preciso
+   `new ILibrasWidget({ token })`
 
 ### Estilos não aplicados
 
-1. Verifique se o CSS foi carregado antes do JS
-2. Verifique conflitos com outros estilos da página
-3. Use `!important` se necessário para sobrescrever estilos
+A partir da v1.4.0 o estilo vai dentro do JavaScript; não há mais CSS para
+carregar na ordem certa. Se o visual está estranho, é conflito com o CSS do
+site — usar `!important` nas suas regras resolve.
 
-### Redirecionamento não funciona
+### Aparecem dois widgets
 
-1. Verifique se a `redirectUrl` está correta
-2. Certifique-se de que o formulário foi preenchido corretamente
-3. Verifique se o CPF é válido
+Em React, Vue ou Angular, chame `destroy()` na desmontagem do componente. Sem
+isso cada montagem deixa um widget para trás.
+
+### Erro de importação em Next.js ou Nuxt
+
+O pacote não toca o DOM ao ser importado, então o import em si é seguro. Mas
+`new ILibrasWidget(...)` precisa do navegador: crie dentro de `useEffect`
+(React) ou `onMounted` (Vue), nunca no corpo do componente.
 
 ## 🤝 Contribuindo
 

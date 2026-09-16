@@ -4,6 +4,64 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 ---
 
+## [1.4.0] - 2026-09-16
+
+### 📦 O widget virou pacote npm
+
+```bash
+npm i ilibras-widget
+```
+
+```js
+import ILibrasWidget from 'ilibras-widget';
+new ILibrasWidget({ token: 'SEU_TOKEN' });
+```
+
+Três formatos saem da mesma fonte (`src/`): ESM para bundler, CJS para
+`require`, e a build de `<script>` — que continua publicada no mesmo endereço
+de sempre, `ilibras-widget.js` na raiz. Nenhum site instalado precisa mudar
+nada.
+
+Publicar no npm também dá uma CDN de graça:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/ilibras-widget@1/dist/ilibras-widget.js"></script>
+```
+
+### 🖼️ Estilo e logo agora vão dentro do JavaScript
+
+Era um `<link>` para um CSS irmão e um `<img>` para um SVG irmão, ambos
+resolvidos procurando a própria `<script src>` na página. Sob um bundler essa
+tag não existe: o caminho caía na URL do site do cliente, dava 404, e o widget
+aparecia cru — sem nada no console que explicasse por quê.
+
+**Isso corrige um problema que já existia.** As instruções de instalação nunca
+mencionaram `ilibras-LOGO.svg` — mandavam baixar só o JS e o CSS. Quem seguiu o
+README ao pé da letra estava com a logo do botão quebrada desde sempre.
+
+O `<style>` é acrescentado ao fim do `<head>`, na mesma posição de cascata do
+`<link>` de antes: quem sobrescreve o visual pelo CSS do próprio site segue
+sobrescrevendo igual.
+
+### 🔤 Tipos TypeScript inclusos
+
+Sem instalar `@types`. Cobrem a configuração inteira, os métodos públicos e os
+tipos de falha.
+
+### 🧪 Testes
+
+`npm test` guarda o que mais provavelmente quebra num pacote embarcável: o
+widget chegar ao site do cliente sem estilo ou sem logo, o import criar widget
+sozinho, ou a build de `<script>` perder o global que o WordPress usa.
+
+### 🔁 Compatibilidade
+
+Nada quebra. O `ilibras-widget.js` da raiz tem o mesmo endereço, o mesmo global
+e o mesmo comportamento — só que agora se basta. O `ilibras-widget.css` continua
+no repositório para quem ainda o referencia, mas não é mais necessário.
+
+---
+
 ## [1.3.0] - 2026-09-16
 
 ### ✨ Agendamento direto pelo widget
