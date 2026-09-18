@@ -1,5 +1,5 @@
 /*!
- * iLibras Widget v1.4.0
+ * iLibras Widget v1.5.0
  * https://github.com/Dimendes-Solucoes/Ilibras_widget
  * Licença MIT
  *
@@ -740,75 +740,6 @@
       texto: ""
     }
   };
-  var DDDS = [
-    11,
-    12,
-    13,
-    14,
-    15,
-    16,
-    17,
-    18,
-    19,
-    21,
-    22,
-    24,
-    27,
-    28,
-    31,
-    32,
-    33,
-    34,
-    35,
-    37,
-    38,
-    41,
-    42,
-    43,
-    44,
-    45,
-    46,
-    47,
-    48,
-    49,
-    51,
-    53,
-    54,
-    55,
-    61,
-    62,
-    63,
-    64,
-    65,
-    66,
-    67,
-    68,
-    69,
-    71,
-    73,
-    74,
-    75,
-    77,
-    79,
-    81,
-    82,
-    83,
-    84,
-    85,
-    86,
-    87,
-    88,
-    89,
-    91,
-    92,
-    93,
-    94,
-    95,
-    96,
-    97,
-    98,
-    99
-  ];
   var FOCAVEIS = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
   var ILibrasWidget = class {
     constructor(config = {}) {
@@ -892,24 +823,6 @@
             </div>
 
             <div class="ilibras-widget-form-group">
-              <label for="ilibras-cpf">CPF <span aria-hidden="true">*</span></label>
-              <input type="text" id="ilibras-cpf" name="cpf" placeholder="000.000.000-00"
-                     required aria-required="true" maxlength="14" autocomplete="off"
-                     inputmode="numeric" aria-describedby="ilibras-cpf-dica ilibras-cpf-erro" />
-              <span class="ilibras-widget-dica" id="ilibras-cpf-dica">Somente números.</span>
-              <span class="ilibras-widget-erro" id="ilibras-cpf-erro" hidden></span>
-            </div>
-
-            <div class="ilibras-widget-form-group">
-              <label for="ilibras-phone">Telefone <span aria-hidden="true">*</span></label>
-              <input type="tel" id="ilibras-phone" name="phone" placeholder="(00) 00000-0000"
-                     required aria-required="true" maxlength="15" autocomplete="tel"
-                     inputmode="numeric" aria-describedby="ilibras-phone-dica ilibras-phone-erro" />
-              <span class="ilibras-widget-dica" id="ilibras-phone-dica">Com DDD. Ex.: (11) 98765-4321.</span>
-              <span class="ilibras-widget-erro" id="ilibras-phone-erro" hidden></span>
-            </div>
-
-            <div class="ilibras-widget-form-group">
               <label for="ilibras-consent" class="ilibras-widget-checkbox-label">
                 <input type="checkbox" id="ilibras-consent" name="consent" required aria-required="true"
                        aria-describedby="ilibras-consent-erro" />
@@ -974,14 +887,11 @@
         }
         if (e.key === "Tab") this.prenderFoco(e);
       });
-      this.setupInputMasks();
-      [["name", "nome"], ["cpf", "cpf"], ["phone", "telefone"]].forEach(([id, campo]) => {
-        const input = this.container.querySelector("#ilibras-" + id);
-        input.addEventListener("blur", () => {
-          if (input.value.trim() !== "") this.validarCampo(campo);
-        });
-        input.addEventListener("input", () => this.limparErro(id));
+      const nome = this.container.querySelector("#ilibras-name");
+      nome.addEventListener("blur", () => {
+        if (nome.value.trim() !== "") this.validarCampo("nome");
       });
+      nome.addEventListener("input", () => this.limparErro("name"));
       this.container.querySelector("#ilibras-consent").addEventListener("change", () => this.limparErro("consent"));
       this.form.addEventListener("submit", (e) => this.handleSubmit(e, "fila"));
       if (this.agendar) {
@@ -1000,28 +910,6 @@
         evento.preventDefault();
         primeiro.focus();
       }
-    }
-    setupInputMasks() {
-      const cpfInput = this.container.querySelector("#ilibras-cpf");
-      const phoneInput = this.container.querySelector("#ilibras-phone");
-      cpfInput.addEventListener("input", (e) => {
-        let value = e.target.value.replace(/\D/g, "").slice(0, 11);
-        value = value.replace(/(\d{3})(\d)/, "$1.$2");
-        value = value.replace(/(\d{3})(\d)/, "$1.$2");
-        value = value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-        e.target.value = value;
-      });
-      phoneInput.addEventListener("input", (e) => {
-        let value = e.target.value.replace(/\D/g, "").slice(0, 11);
-        if (value.length <= 10) {
-          value = value.replace(/(\d{2})(\d)/, "($1) $2");
-          value = value.replace(/(\d{4})(\d)/, "$1-$2");
-        } else {
-          value = value.replace(/(\d{2})(\d)/, "($1) $2");
-          value = value.replace(/(\d{5})(\d)/, "$1-$2");
-        }
-        e.target.value = value;
-      });
     }
     toggleWidget() {
       if (this.isOpen) this.closeWidget();
@@ -1057,8 +945,6 @@
     valores() {
       return {
         nome: this.container.querySelector("#ilibras-name").value.trim().replace(/\s+/g, " "),
-        cpf: this.container.querySelector("#ilibras-cpf").value.replace(/\D/g, ""),
-        telefone: this.container.querySelector("#ilibras-phone").value.replace(/\D/g, ""),
         consentimento: this.container.querySelector("#ilibras-consent").checked,
         honeypot: this.container.querySelector("#ilibras-site-url").value
       };
@@ -1075,23 +961,6 @@
         if (palavras.length < 2) return "Informe o nome completo (nome e sobrenome).";
         return null;
       }
-      if (campo === "cpf") {
-        if (!v.cpf) return "Informe seu CPF.";
-        if (!this.validateCPF(v.cpf)) return "CPF inválido. Verifique o número digitado.";
-        return null;
-      }
-      if (campo === "telefone") {
-        if (!v.telefone) return "Informe seu telefone com DDD.";
-        if (v.telefone.length < 10 || v.telefone.length > 11) {
-          return "O telefone deve ter DDD e 8 ou 9 dígitos.";
-        }
-        if (!DDDS.includes(parseInt(v.telefone.slice(0, 2), 10))) return "O DDD informado não existe.";
-        const assinante = v.telefone.slice(2);
-        if (/^(\d)\1+$/.test(assinante)) return "O telefone informado é inválido.";
-        const inicioOk = assinante.length === 9 ? assinante[0] === "9" : ["2", "3", "4", "5"].includes(assinante[0]);
-        if (!inicioOk) return "O telefone informado é inválido.";
-        return null;
-      }
       if (campo === "consent" && !v.consentimento) {
         return "É preciso aceitar para continuar.";
       }
@@ -1099,7 +968,7 @@
     }
     validarCampo(campo) {
       const erro = this.erroDoCampo(campo, this.valores());
-      const id = { nome: "name", cpf: "cpf", telefone: "phone", consent: "consent" }[campo];
+      const id = { nome: "name", consent: "consent" }[campo];
       if (erro) this.mostrarErro(id, erro);
       else this.limparErro(id);
       return !erro;
@@ -1110,7 +979,7 @@
     validarTudo() {
       const v = this.valores();
       let primeiroInvalido = null;
-      for (const [campo, id] of [["nome", "name"], ["cpf", "cpf"], ["telefone", "phone"], ["consent", "consent"]]) {
+      for (const [campo, id] of [["nome", "name"], ["consent", "consent"]]) {
         const erro = this.erroDoCampo(campo, v);
         if (erro) {
           this.mostrarErro(id, erro);
@@ -1143,18 +1012,6 @@
         campo.removeAttribute("aria-invalid");
         campo.classList.remove("ilibras-widget-invalido");
       }
-    }
-    validateCPF(cpf) {
-      cpf = String(cpf).replace(/\D/g, "");
-      if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
-      for (let t = 9; t < 11; t++) {
-        let soma = 0;
-        for (let i = 0; i < t; i++) soma += parseInt(cpf[i], 10) * (t + 1 - i);
-        const resto = soma % 11;
-        const digito = resto < 2 ? 0 : 11 - resto;
-        if (parseInt(cpf[t], 10) !== digito) return false;
-      }
-      return true;
     }
     // ─── Avisos ─────────────────────────────────────────────────────────────
     mostrarAviso(mensagem, { fallback = false } = {}) {
@@ -1239,8 +1096,6 @@
       const v = this.valores();
       const corpo = new FormData();
       corpo.append("nome", v.nome);
-      corpo.append("cpf", v.cpf);
-      corpo.append("telefone", v.telefone);
       corpo.append("site_url", v.honeypot);
       corpo.append("iniciado_em", String(this.abertoEm || Date.now()));
       corpo.append("modo", modo);
@@ -1341,7 +1196,7 @@
     tratarFalha(erro) {
       const tipo = erro instanceof FalhaDeServico ? erro.tipo : "desconhecido";
       if (tipo === "validacao" && erro.detalhe.erros) {
-        const mapa = { nome: "name", cpf: "cpf", telefone: "phone" };
+        const mapa = { nome: "name" };
         let primeiro = null;
         for (const [campo, mensagens2] of Object.entries(erro.detalhe.erros)) {
           const id = mapa[campo];

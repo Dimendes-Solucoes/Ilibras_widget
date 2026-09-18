@@ -4,7 +4,7 @@
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![CSS3](https://img.shields.io/badge/CSS-3-blue.svg)](https://developer.mozilla.org/en-US/docs/Web/CSS)
 
-Widget embarcável similar ao WhatsApp para captura de dados (Nome e CPF) com integração via API. Envia dados de forma segura via POST e redireciona para plataforma de atendimento. Ideal para integração em sites, sistemas e plataformas web.
+Widget de acessibilidade em Libras: um botão flutuante que leva a pessoa surda ao atendimento com intérprete — ao vivo ou agendado. Pede só o nome, envia por POST e redireciona para a plataforma. Ideal para sites, sistemas e plataformas web.
 
 ![iLibras Widget](https://via.placeholder.com/800x400/25D366/FFFFFF?text=iLibras+Widget)
 
@@ -13,9 +13,9 @@ Widget embarcável similar ao WhatsApp para captura de dados (Nome e CPF) com in
 - 🚀 **Fácil integração** - Apenas 2 linhas de código
 - 🎨 **Totalmente personalizável** - Cores, posição, textos e mais
 - 📱 **Responsivo** - Funciona perfeitamente em desktop e mobile
-- ✅ **Validação automática** - CPF validado antes do envio
+- 🙋 **Pede só o nome** - Nada de CPF ou telefone para ser atendido
+- 📅 **Ao vivo ou agendado** - Entrar na fila agora, ou marcar dia e hora
 - 🔒 **Envio seguro** - Dados enviados via POST para API
-- 🎭 **Máscaras de entrada** - Formatação automática de CPF
 - 🌐 **Universal** - Funciona em qualquer site ou sistema
 - ♿ **Acessível** - Suporte a leitores de tela e navegação por teclado
 - 🌙 **Tema escuro** - Adapta-se automaticamente às preferências do usuário
@@ -213,17 +213,20 @@ Os dados são enviados como **FormData** (similar a um formulário HTML tradicio
 
 ```
 nome: "João Silva"
-cpf: "12345678900"
-telefone: "11987654321"
+modo: "fila"
 token: "seu_token_de_autenticacao"
 ```
 
 | Campo | Descrição | Formato |
 |-------|-----------|------|
 | `nome` | Nome completo do usuário | String |
-| `cpf` | CPF sem formatação (apenas números) | String numérica (11 dígitos) |
-| `telefone` | Telefone sem formatação (apenas números) | String numérica (10-11 dígitos) |
+| `modo` | `fila` (atendimento agora) ou `agendamento` (escolher dia e hora) | String |
 | `token` | Token de autenticação fornecido pela equipe | String |
+
+> Até a v1.4.0 o widget também enviava `cpf` e `telefone`. A partir da v1.5.0
+> não envia mais: para chamar um intérprete não é preciso identificar a pessoa,
+> e cada campo a mais era uma barreira a quem só queria ser atendido. A API
+> continua aceitando os dois campos, para os widgets antigos ainda instalados.
 
 ### Resposta Esperada da API
 
@@ -428,18 +431,6 @@ Todos os dados são enviados via **método POST** (não via URL/GET), garantindo
 - Maior segurança no tráfego de informações sensíveis
 - Conformidade com boas práticas de desenvolvimento web
 
-### Validação de CPF
-
-O widget valida o CPF antes do envio usando o algoritmo de verificação de dígitos. CPFs inválidos são rejeitados automaticamente.
-
-```javascript
-// CPFs aceitos: números válidos com 11 dígitos
-// CPFs rejeitados: 
-// - Números com menos de 11 dígitos
-// - Sequências repetidas (111.111.111-11)
-// - Dígitos verificadores incorretos
-```
-
 ### Validação de Nome
 
 - Entre 3 e 120 caracteres
@@ -447,16 +438,13 @@ O widget valida o CPF antes do envio usando o algoritmo de verificação de díg
   pontuação de código são rejeitados
 - Exige nome e sobrenome
 
-### Validação de Telefone
-
-- DDD conferido contra a lista de códigos em uso no país
-- Celular com 9 dígitos precisa começar em 9; fixo com 8 dígitos, entre 2 e 5
-- Sequências repetidas (00000000000) são rejeitadas
-
 ### Sanitização de Dados
 
-- CPF e telefone: apenas dígitos
 - Nome: espaços das pontas removidos e sequências de espaço reduzidas a um
+
+> O telefone não é mais pedido aqui. Quem agenda um horário e quer aviso por
+> SMS informa o celular na própria tela de agendamento do iLibras, e ele vale
+> só para aquele atendimento.
 
 > **A validação do widget é conveniência, não barreira.** Ela roda no navegador
 > e qualquer pessoa a desliga pelo console. As mesmas regras valem no servidor,

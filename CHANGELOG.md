@@ -4,6 +4,41 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 ---
 
+## [1.5.0] - 2026-09-18
+
+### 🙋 O formulário pede só o nome
+
+CPF e telefone saíram. Para chamar um intérprete não é preciso identificar a
+pessoa, e cada campo a mais era uma barreira a quem só queria ser atendido — em
+especial um CPF digitado errado, que reprovava o envio inteiro.
+
+Sai junto o que existia só para eles: a validação de CPF, a lista de DDDs, as
+máscaras dos dois campos. O widget ficou 4,5 KB menor.
+
+O que continua: nome (com sobrenome), a caixa de consentimento, a armadilha
+anti-robô e a marca de tempo de abertura.
+
+### 📲 Aviso por SMS mora no iLibras, não aqui
+
+Quem agenda um horário e quer ser avisado por SMS informa o celular **na tela
+de agendamento do iLibras**, e o número vale só para aquele atendimento. Era o
+motivo que restava para o widget pedir telefone de todo mundo — inclusive de
+quem nem ia agendar.
+
+### 🔁 Compatibilidade
+
+A API continua aceitando `cpf` e `telefone`, então **widget antigo instalado em
+site de cliente segue funcionando** sem ser atualizado.
+
+Esta é uma versão **minor** de propósito, e não major: quem seguiu o README e
+fixou `@1` recebe a mudança automaticamente, que é o ponto. A API pública do
+pacote (configuração e métodos) não mudou em nada.
+
+**Requer o iLibras com CPF e telefone opcionais.** Contra uma versão anterior do
+servidor, o cadastro sem CPF seria recusado com erro de validação.
+
+---
+
 ## [1.4.0] - 2026-09-16
 
 ### 📦 O widget virou pacote npm
