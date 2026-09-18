@@ -512,8 +512,19 @@ class ILibrasWidget {
       // window.open depois de await pode cair no bloqueador de pop-up. Se
       // cair, a mesma aba leva — melhor trocar de página do que sumir com o
       // atendimento que já foi criado.
-      const aba = window.open(destino, '_blank', 'noopener');
-      if (!aba) window.location.assign(destino);
+      //
+      // Sem a feature 'noopener' de propósito: com ela, a especificação manda
+      // window.open devolver null MESMO quando a aba abre. O teste abaixo lia
+      // esse null como pop-up bloqueado e navegava a aba atual também — a
+      // pessoa ficava com duas. Anular `opener` na mão dá a mesma proteção e
+      // preserva o retorno, que é o que distingue aba aberta de aba barrada.
+      const aba = window.open(destino, '_blank');
+
+      if (aba) {
+        aba.opener = null;
+      } else {
+        window.location.assign(destino);
+      }
 
       this.form.reset();
       this.closeWidget();

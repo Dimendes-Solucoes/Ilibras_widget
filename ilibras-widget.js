@@ -1,5 +1,5 @@
 /*!
- * iLibras Widget v1.5.1
+ * iLibras Widget v1.5.2
  * https://github.com/Dimendes-Solucoes/Ilibras_widget
  * Licença MIT
  *
@@ -1105,8 +1105,12 @@
         const destino = resultado.link_fila || resultado.link || resultado.url || resultado.redirect;
         if (!destino) throw new FalhaDeServico("resposta_inesperada");
         this.anunciar(modo === "agendamento" ? "Cadastro feito. Abrindo o calendário para escolher data e horário." : "Atendimento criado. Abrindo a sala de atendimento.");
-        const aba = window.open(destino, "_blank", "noopener");
-        if (!aba) window.location.assign(destino);
+        const aba = window.open(destino, "_blank");
+        if (aba) {
+          aba.opener = null;
+        } else {
+          window.location.assign(destino);
+        }
         this.form.reset();
         this.closeWidget();
       } catch (erro) {

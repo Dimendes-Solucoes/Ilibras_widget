@@ -4,6 +4,32 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 ---
 
+## [1.5.2] - 2026-09-18
+
+### 🗂️ Uma aba, não duas
+
+Ao criar o atendimento, o widget abria a aba nova **e** trocava a página da aba
+atual. A pessoa terminava com duas.
+
+A causa estava no plano B para pop-up bloqueado:
+
+```js
+const aba = window.open(destino, '_blank', 'noopener');
+if (!aba) window.location.assign(destino);
+```
+
+A especificação manda `window.open` devolver `null` sempre que `noopener` está
+presente — **mesmo quando a aba abre**. O teste lia esse `null` como pop-up
+bloqueado, e a segunda linha disparava sempre.
+
+Agora a chamada vai sem a feature e a proteção é feita na mão
+(`aba.opener = null`), o que dá o mesmo isolamento e preserva o retorno — que é
+justamente o que distingue aba aberta de aba barrada. O plano B continua de pé
+para quando o pop-up é realmente bloqueado: melhor trocar de página do que
+sumir com um atendimento já criado.
+
+---
+
 ## [1.5.1] - 2026-09-18
 
 ### 🎨 O tema do site não pinta mais o widget
