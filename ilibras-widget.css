@@ -18,28 +18,28 @@
 }
 
 /* Posicionamento */
-.ilibras-widget-bottom-right {
+#ilibras-widget-container .ilibras-widget-bottom-right {
   bottom: 30px;
   right: 30px;
 }
 
-.ilibras-widget-bottom-left {
+#ilibras-widget-container .ilibras-widget-bottom-left {
   bottom: 30px;
   left: 30px;
 }
 
-.ilibras-widget-top-right {
+#ilibras-widget-container .ilibras-widget-top-right {
   top: 30px;
   right: 30px;
 }
 
-.ilibras-widget-top-left {
+#ilibras-widget-container .ilibras-widget-top-left {
   top: 30px;
   left: 30px;
 }
 
 /* Botão flutuante (apenas ícone) */
-.ilibras-widget-button {
+#ilibras-widget-container .ilibras-widget-button {
   position: relative;
   border: none;
   font: inherit;
@@ -61,23 +61,23 @@
   z-index: 10001;
 }
 
-.ilibras-widget-button img {
+#ilibras-widget-container .ilibras-widget-button img {
   width: 64px;
   height: 64px;
 }
 
 .ilibras-widget-button:hover,
-.ilibras-widget-button:active {
+#ilibras-widget-container .ilibras-widget-button:active {
   transform: none;
   box-shadow: none;
 }
 
-.ilibras-widget-button svg {
+#ilibras-widget-container .ilibras-widget-button svg {
   filter: none;
 }
 
 /* Badge de notificação */
-.ilibras-widget-badge {
+#ilibras-widget-container .ilibras-widget-badge {
   position: absolute;
   top: -2px;
   right: -2px;
@@ -105,7 +105,7 @@
 }
 
 /* Modal */
-.ilibras-widget-modal {
+#ilibras-widget-container .ilibras-widget-modal {
   position: fixed;
   /* responsivo ao tamanho do monitor */
   width: clamp(320px, 26vw, 480px);
@@ -122,7 +122,7 @@
   overflow: hidden;
 }
 
-.ilibras-widget-modal-open {
+#ilibras-widget-container .ilibras-widget-modal-open {
   opacity: 1;
   visibility: visible;
   transform: translateY(0) scale(1);
@@ -130,26 +130,26 @@
 
 /* Posicionamento do modal baseado na posição do botão */
 .ilibras-widget-bottom-right .ilibras-widget-modal,
-.ilibras-widget-bottom-left .ilibras-widget-modal {
+#ilibras-widget-container .ilibras-widget-bottom-left .ilibras-widget-modal {
   bottom: 105px;
 }
 
 .ilibras-widget-top-right .ilibras-widget-modal,
-.ilibras-widget-top-left .ilibras-widget-modal {
+#ilibras-widget-container .ilibras-widget-top-left .ilibras-widget-modal {
   top: 105px;
 }
 
 .ilibras-widget-bottom-right .ilibras-widget-modal,
-.ilibras-widget-top-right .ilibras-widget-modal {
+#ilibras-widget-container .ilibras-widget-top-right .ilibras-widget-modal {
   right: 0;
 }
 
 .ilibras-widget-bottom-left .ilibras-widget-modal,
-.ilibras-widget-top-left .ilibras-widget-modal {
+#ilibras-widget-container .ilibras-widget-top-left .ilibras-widget-modal {
   left: 0;
 }
 
-.ilibras-widget-header {
+#ilibras-widget-container .ilibras-widget-header {
   background: white;
   padding: 14px 24px;
   display: flex;
@@ -160,18 +160,18 @@
   border-bottom: 2px solid rgba(53,122,189,0.06);
 }
 
-.ilibras-widget-header-content {
+#ilibras-widget-container .ilibras-widget-header-content {
   display: flex;
   align-items: center;
   gap: 16px;
   flex: 1;
 }
 
-.ilibras-widget-logo {
+#ilibras-widget-container .ilibras-widget-logo {
   display: none !important;
 }
 
-.ilibras-widget-title {
+#ilibras-widget-container .ilibras-widget-title {
   padding-left: 0;
   font-size: 17px;
   font-weight: 700;
@@ -179,7 +179,7 @@
   color: #1f4f7a;
 }
 
-.ilibras-widget-close {
+#ilibras-widget-container .ilibras-widget-close {
   background: transparent;
   border: none;
   cursor: pointer;
@@ -194,22 +194,22 @@
   flex-shrink: 0;
 }
 
-.ilibras-widget-close:hover {
+#ilibras-widget-container .ilibras-widget-close:hover {
   background: rgba(53,122,189,0.08);
   transform: translateY(-1px);
 }
 
-.ilibras-widget-close:active {
+#ilibras-widget-container .ilibras-widget-close:active {
   background: rgba(53,122,189,0.12);
 }
 
 /* Body do modal */
-.ilibras-widget-body {
+#ilibras-widget-container .ilibras-widget-body {
   padding: 20px !important;
   background: white; /* fundo branco do widget */
 }
 
-.ilibras-widget-message {
+#ilibras-widget-container .ilibras-widget-message {
   background: rgba(74,144,226,0.06); /* leve tom da cor da logo */
   border-radius: 14px; 
   border: 1px solid rgba(74,144,226,0.08);
@@ -220,19 +220,19 @@
 }
 
 /* Formulário */
-.ilibras-widget-form {
+#ilibras-widget-container .ilibras-widget-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.ilibras-widget-form-group {
+#ilibras-widget-container .ilibras-widget-form-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.ilibras-widget-form-group label {
+#ilibras-widget-container .ilibras-widget-form-group label {
   font-size: 13px;
   font-weight: 500;
   color: #495057;
@@ -240,7 +240,7 @@
 }
 
 .ilibras-widget-form-group input[type="text"],
-.ilibras-widget-form-group input[type="tel"] {
+#ilibras-widget-container .ilibras-widget-form-group input[type="tel"] {
   background: #ffffff;
   border: 1px solid rgba(20,30,45,0.06);
   padding: 12px 14px !important;
@@ -249,7 +249,7 @@
 }
 
 .ilibras-widget-form-group input[type="text"]:focus,
-.ilibras-widget-form-group input[type="tel"]:focus {
+#ilibras-widget-container .ilibras-widget-form-group input[type="tel"]:focus {
   background: white;
   border-color: #357ABD;
   box-shadow: 0 6px 18px rgba(53,122,189,0.08);
@@ -257,12 +257,12 @@
 }
 
 .ilibras-widget-form-group input[type="text"]::placeholder,
-.ilibras-widget-form-group input[type="tel"]::placeholder {
+#ilibras-widget-container .ilibras-widget-form-group input[type="tel"]::placeholder {
   color: #6c757d;
 }
 
 /* Checkbox customizado */
-.ilibras-widget-checkbox-label {
+#ilibras-widget-container .ilibras-widget-checkbox-label {
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -274,7 +274,7 @@
   line-height: 1.4;
 }
 
-.ilibras-widget-checkbox-label input[type="checkbox"] {
+#ilibras-widget-container .ilibras-widget-checkbox-label input[type="checkbox"] {
   margin-top: 2px;
   width: 18px;
   height: 18px;
@@ -282,13 +282,13 @@
   accent-color: #357ABD;
 }
 
-.ilibras-widget-checkbox-label span {
+#ilibras-widget-container .ilibras-widget-checkbox-label span {
   flex: 1;
 }
 
 /* Botão de submit */
 
-.ilibras-widget-submit {
+#ilibras-widget-container .ilibras-widget-submit {
   padding: 12px 14px !important;
   border-radius: 10px;
   font-size: 15px;
@@ -301,17 +301,17 @@
   transition: transform 0.14s ease, box-shadow 0.14s ease, opacity 0.12s;
 }
 
-.ilibras-widget-submit:hover {
+#ilibras-widget-container .ilibras-widget-submit:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 22px rgba(53,122,189,0.18);
 }
 
-.ilibras-widget-submit:active {
+#ilibras-widget-container .ilibras-widget-submit:active {
   transform: translateY(0);
   box-shadow: 0 4px 10px rgba(53,122,189,0.12);
 }
 
-.ilibras-widget-submit:disabled {
+#ilibras-widget-container .ilibras-widget-submit:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
@@ -320,7 +320,7 @@
 /* Agendar é a segunda escolha, não a concorrente: contorno em vez de preenchido,
    para a hierarquia entre "agora" e "depois" ficar visível antes da leitura. O
    form tem gap de 20px; as margens negativas colam o botão na dica que o explica. */
-.ilibras-widget-agendar {
+#ilibras-widget-container .ilibras-widget-agendar {
   padding: 11px 14px !important;
   border-radius: 10px;
   font-size: 15px;
@@ -334,73 +334,73 @@
   margin-top: -8px;
 }
 
-.ilibras-widget-agendar:hover:not(:disabled) {
+#ilibras-widget-container .ilibras-widget-agendar:hover:not(:disabled) {
   background: #F2F7FD;
   border-color: #357ABD;
 }
 
-.ilibras-widget-agendar:disabled {
+#ilibras-widget-container .ilibras-widget-agendar:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.ilibras-widget-dica-agendar {
+#ilibras-widget-container .ilibras-widget-dica-agendar {
   margin-top: -14px;
   text-align: center;
 }
 
 /* Responsividade */
 @media (max-width: 480px) {
-  .ilibras-widget-modal {
+  #ilibras-widget-container .ilibras-widget-modal {
     width: calc(100vw - 40px);
     max-width: 100%;
   }
 
   .ilibras-widget-bottom-right,
-  .ilibras-widget-bottom-left {
+  #ilibras-widget-container .ilibras-widget-bottom-left {
     bottom: 20px;
     left: 20px !important;
     right: 20px !important;
   }
 
   .ilibras-widget-top-right,
-  .ilibras-widget-top-left {
+  #ilibras-widget-container .ilibras-widget-top-left {
     top: 20px;
     left: 20px !important;
     right: 20px !important;
   }
 
-  .ilibras-widget-button {
+  #ilibras-widget-container .ilibras-widget-button {
     width: 64px;
     height: 64px;
   }
 
-  .ilibras-widget-button svg {
+  #ilibras-widget-container .ilibras-widget-button svg {
     width: 32px;
     height: 32px;
   }
 
-  .ilibras-widget-modal {
+  #ilibras-widget-container .ilibras-widget-modal {
     bottom: 94px !important;
     right: 0 !important;
     left: 0 !important;
     margin: 0 20px;
   }
 
-  .ilibras-widget-body {
+  #ilibras-widget-container .ilibras-widget-body {
     padding: 18px 16px;
   }
 }
 
 @media (min-width: 1600px) {
-  .ilibras-widget-modal {
+  #ilibras-widget-container .ilibras-widget-modal {
     width: clamp(360px, 20vw, 560px);
   }
 }
 
 .ilibras-widget-button:focus-visible,
 .ilibras-widget-close:focus-visible,
-.ilibras-widget-submit:focus-visible {
+#ilibras-widget-container .ilibras-widget-submit:focus-visible {
   outline: 3px solid rgba(53,122,189,0.18);
   outline-offset: 3px;
 }
@@ -426,43 +426,43 @@
 /* Accessibilidade */
 .ilibras-widget-button:focus-visible,
 .ilibras-widget-close:focus-visible,
-.ilibras-widget-submit:focus-visible {
+#ilibras-widget-container .ilibras-widget-submit:focus-visible {
   outline: 3px solid #4A90E2;
   outline-offset: 2px;
 }
 
 /* Tema escuro (opcional) */
 @media (prefers-color-scheme: dark) {
-  .ilibras-widget-modal {
+  #ilibras-widget-container .ilibras-widget-modal {
     background: #1e1e1e;
   }
 
-  .ilibras-widget-body {
+  #ilibras-widget-container .ilibras-widget-body {
     background: #2d2d2d;
   }
 
-  .ilibras-widget-message {
+  #ilibras-widget-container .ilibras-widget-message {
     background: #363636;
     color: #e0e0e0;
   }
 
-  .ilibras-widget-form-group label {
+  #ilibras-widget-container .ilibras-widget-form-group label {
     color: #b0b0b0;
   }
 
   .ilibras-widget-form-group input[type="text"],
-  .ilibras-widget-form-group input[type="tel"] {
+  #ilibras-widget-container .ilibras-widget-form-group input[type="tel"] {
     background: #363636;
     border-color: #4a4a4a;
     color: #e0e0e0;
   }
 
   .ilibras-widget-form-group input[type="text"]::placeholder,
-  .ilibras-widget-form-group input[type="tel"]::placeholder {
+  #ilibras-widget-container .ilibras-widget-form-group input[type="tel"]::placeholder {
     color: #6c6c6c;
   }
 
-  .ilibras-widget-checkbox-label {
+  #ilibras-widget-container .ilibras-widget-checkbox-label {
     color: #b0b0b0;
   }
 }
@@ -476,7 +476,7 @@
 
 /* Visível só para leitor de tela. Não usa display:none — o que some da tela
    dessa forma some também da leitura. */
-.ilibras-widget-sr-only {
+#ilibras-widget-container .ilibras-widget-sr-only {
   position: absolute !important;
   width: 1px;
   height: 1px;
@@ -490,7 +490,7 @@
 
 /* Armadilha do anti-robô: fora da tela e fora da leitura, mas presente no DOM
    (bot que ignora display:none continua encontrando e preenchendo). */
-.ilibras-widget-hp {
+#ilibras-widget-container .ilibras-widget-hp {
   position: absolute !important;
   left: -9999px;
   top: auto;
@@ -501,23 +501,23 @@
 
 /* O diálogo fechado não pode receber foco: com hidden, nada dentro dele entra
    na ordem de tabulação. */
-.ilibras-widget-modal[hidden] {
+#ilibras-widget-container .ilibras-widget-modal[hidden] {
   display: none !important;
 }
 
-.ilibras-widget-legenda {
+#ilibras-widget-container .ilibras-widget-legenda {
   font-size: 12px;
   color: #495057;
   margin: 0 0 -8px 4px;
 }
 
-.ilibras-widget-dica {
+#ilibras-widget-container .ilibras-widget-dica {
   font-size: 12px;
   color: #495057;
   padding-left: 4px;
 }
 
-.ilibras-widget-erro {
+#ilibras-widget-container .ilibras-widget-erro {
   font-size: 13px;
   font-weight: 500;
   color: #b02a37;
@@ -529,23 +529,23 @@
 
 /* A cor não pode ser o único sinal de erro: quem não distingue vermelho
    precisa do símbolo e do texto. */
-.ilibras-widget-erro::before {
+#ilibras-widget-container .ilibras-widget-erro::before {
   content: "\26A0";
   font-size: 13px;
   line-height: 1.3;
 }
 
-.ilibras-widget-erro[hidden] {
+#ilibras-widget-container .ilibras-widget-erro[hidden] {
   display: none;
 }
 
-.ilibras-widget-form-group input.ilibras-widget-invalido {
+#ilibras-widget-container .ilibras-widget-form-group input.ilibras-widget-invalido {
   border-color: #b02a37;
   border-width: 2px;
 }
 
 /* Aviso de falha de serviço / limite de uso. */
-.ilibras-widget-aviso {
+#ilibras-widget-container .ilibras-widget-aviso {
   background: #fdf2f2;
   border: 1px solid #f0c2c2;
   border-left: 4px solid #b02a37;
@@ -557,47 +557,47 @@
   line-height: 1.5;
 }
 
-.ilibras-widget-aviso[hidden] {
+#ilibras-widget-container .ilibras-widget-aviso[hidden] {
   display: none;
 }
 
-.ilibras-widget-aviso:focus-visible {
+#ilibras-widget-container .ilibras-widget-aviso:focus-visible {
   outline: 3px solid #b02a37;
   outline-offset: 2px;
 }
 
-.ilibras-widget-aviso-texto {
+#ilibras-widget-container .ilibras-widget-aviso-texto {
   margin: 0;
 }
 
 /* Plano de contingência: aparece quando a API não responde. */
-.ilibras-widget-fallback {
+#ilibras-widget-container .ilibras-widget-fallback {
   margin-top: 10px;
   padding-top: 10px;
   border-top: 1px solid #f0c2c2;
   font-size: 13px;
 }
 
-.ilibras-widget-fallback p {
+#ilibras-widget-container .ilibras-widget-fallback p {
   margin: 0 0 6px;
 }
 
-.ilibras-widget-fallback ul {
+#ilibras-widget-container .ilibras-widget-fallback ul {
   margin: 0;
   padding-left: 18px;
   list-style: disc;
 }
 
-.ilibras-widget-fallback li {
+#ilibras-widget-container .ilibras-widget-fallback li {
   margin: 2px 0;
 }
 
-.ilibras-widget-fallback a {
+#ilibras-widget-container .ilibras-widget-fallback a {
   color: #1f4f7a;
   font-weight: 600;
 }
 
-.ilibras-widget-status {
+#ilibras-widget-container .ilibras-widget-status {
   font-size: 13px;
   color: #495057;
   margin: 0;
@@ -611,7 +611,7 @@
 .ilibras-widget-submit:focus-visible,
 .ilibras-widget-form-group input:focus-visible,
 .ilibras-widget-checkbox-label input:focus-visible,
-.ilibras-widget-fallback a:focus-visible {
+#ilibras-widget-container .ilibras-widget-fallback a:focus-visible {
   outline: 3px solid #1f4f7a;
   outline-offset: 2px;
 }
@@ -622,14 +622,14 @@
   .ilibras-widget-modal,
   .ilibras-widget-form-group input,
   .ilibras-widget-submit,
-  .ilibras-widget-aviso {
+  #ilibras-widget-container .ilibras-widget-aviso {
     border: 1px solid CanvasText;
   }
 
   .ilibras-widget-button:focus-visible,
   .ilibras-widget-close:focus-visible,
   .ilibras-widget-submit:focus-visible,
-  .ilibras-widget-form-group input:focus-visible {
+  #ilibras-widget-container .ilibras-widget-form-group input:focus-visible {
     outline: 3px solid Highlight;
   }
 }
@@ -641,13 +641,13 @@
   .ilibras-widget-modal,
   .ilibras-widget-submit,
   .ilibras-widget-close,
-  .ilibras-widget-badge {
+  #ilibras-widget-container .ilibras-widget-badge {
     animation: none !important;
     transition: none !important;
   }
 
   .ilibras-widget-submit:hover,
-  .ilibras-widget-close:hover {
+  #ilibras-widget-container .ilibras-widget-close:hover {
     transform: none;
   }
 }
@@ -655,44 +655,44 @@
 @media (prefers-color-scheme: dark) {
   .ilibras-widget-legenda,
   .ilibras-widget-dica,
-  .ilibras-widget-status {
+  #ilibras-widget-container .ilibras-widget-status {
     color: #c9c9c9;
   }
 
-  .ilibras-widget-erro {
+  #ilibras-widget-container .ilibras-widget-erro {
     color: #ff9aa2;
   }
 
-  .ilibras-widget-form-group input.ilibras-widget-invalido {
+  #ilibras-widget-container .ilibras-widget-form-group input.ilibras-widget-invalido {
     border-color: #ff9aa2;
   }
 
-  .ilibras-widget-aviso {
+  #ilibras-widget-container .ilibras-widget-aviso {
     background: #3a2224;
     border-color: #6b3a3f;
     border-left-color: #ff9aa2;
     color: #ffd9dc;
   }
 
-  .ilibras-widget-fallback {
+  #ilibras-widget-container .ilibras-widget-fallback {
     border-top-color: #6b3a3f;
   }
 
-  .ilibras-widget-fallback a {
+  #ilibras-widget-container .ilibras-widget-fallback a {
     color: #9ecbff;
   }
 
-  .ilibras-widget-title {
+  #ilibras-widget-container .ilibras-widget-title {
     color: #e6f0f8;
   }
 
-  .ilibras-widget-header {
+  #ilibras-widget-container .ilibras-widget-header {
     background: #1e1e1e;
     border-left-color: #333;
     border-bottom-color: #333;
   }
 
-  .ilibras-widget-close {
+  #ilibras-widget-container .ilibras-widget-close {
     color: #e0e0e0;
   }
 }

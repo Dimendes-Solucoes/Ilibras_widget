@@ -4,6 +4,33 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 ---
 
+## [1.5.1] - 2026-09-18
+
+### 🎨 O tema do site não pinta mais o widget
+
+Todas as regras de estilo passaram a ser escopadas por
+`#ilibras-widget-container`.
+
+O widget usava seletores de uma classe só — `.ilibras-widget-submit` tem
+especificidade (0,1,0) e perde para qualquer tema que estilize botões com dois
+níveis. Um `.elementor-kit-275 button` é (0,1,1) e vencia.
+
+O estrago aparecia num site real: botões verdes, cantos arredondados em 30px e
+o "X" de fechar virado pílula — dentro de um widget cuja promessa é justamente
+se bastar no site dos outros. O botão principal escapava por acidente, porque o
+gradiente dele pintava por cima da cor do tema; o de agendar, sem gradiente,
+ficava verde.
+
+Com o prefixo, as regras vão a (1,1,0): ganham de qualquer seletor de tema
+**sem recorrer a `!important`**, e continuam perdendo para o `!important` que o
+README ensina o cliente a usar quando quer customizar de propósito. Quem
+customiza sem `!important` precisa passar a usá-lo.
+
+Problema antigo, anterior à v1.5.0 — só ficou visível quando o segundo botão
+entrou no formulário.
+
+---
+
 ## [1.5.0] - 2026-09-18
 
 ### 🙋 O formulário pede só o nome
