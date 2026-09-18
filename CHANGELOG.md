@@ -4,6 +4,35 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 ---
 
+## [1.5.3] - 2026-09-18
+
+### 🩹 Conserta o widget que sumiu da tela na 1.5.1
+
+A 1.5.1 escopou o estilo ao container para o tema do site não pintar o widget —
+e escopou demais.
+
+As classes de posição (`.ilibras-widget-bottom-right` e irmãs) ficam no
+**próprio** container, não num descendente dele. Viraram
+`#ilibras-widget-container .ilibras-widget-bottom-right`, com espaço, que não
+casa com nada: o container perdeu `bottom` e `right`, ficou `fixed` sem âncora
+e foi parar onde o fluxo o largou — milhares de pixels abaixo da tela. O widget
+sumiu de um site em produção.
+
+Agora o escopo dessas quatro é composto — `#ilibras-widget-container.classe` —
+e o das demais segue descendente.
+
+A mesma passagem trazia outros dois furos, dos quais só este deu as caras:
+
+- listas de seletores quebradas em várias linhas tinham só a última linha
+  escopada, e as demais ficavam expostas ao tema;
+- blocos `@media` inteiros passaram sem escopo, porque a regra logo depois da
+  chave do `@media` não era reconhecida.
+
+Os três estão cobertos por teste agora: 124 seletores escopados, 16 deles
+compostos, nenhum solto.
+
+---
+
 ## [1.5.2] - 2026-09-18
 
 ### 🗂️ Uma aba, não duas

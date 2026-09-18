@@ -1,5 +1,5 @@
 /*!
- * iLibras Widget v1.5.2
+ * iLibras Widget v1.5.3
  * https://github.com/Dimendes-Solucoes/Ilibras_widget
  * Licença MIT
  *
@@ -27,22 +27,22 @@
 }
 
 /* Posicionamento */
-#ilibras-widget-container .ilibras-widget-bottom-right {
+#ilibras-widget-container.ilibras-widget-bottom-right {
   bottom: 30px;
   right: 30px;
 }
 
-#ilibras-widget-container .ilibras-widget-bottom-left {
+#ilibras-widget-container.ilibras-widget-bottom-left {
   bottom: 30px;
   left: 30px;
 }
 
-#ilibras-widget-container .ilibras-widget-top-right {
+#ilibras-widget-container.ilibras-widget-top-right {
   top: 30px;
   right: 30px;
 }
 
-#ilibras-widget-container .ilibras-widget-top-left {
+#ilibras-widget-container.ilibras-widget-top-left {
   top: 30px;
   left: 30px;
 }
@@ -75,7 +75,7 @@
   height: 64px;
 }
 
-.ilibras-widget-button:hover,
+#ilibras-widget-container .ilibras-widget-button:hover,
 #ilibras-widget-container .ilibras-widget-button:active {
   transform: none;
   box-shadow: none;
@@ -105,7 +105,8 @@
 }
 
 @keyframes ilibras-pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
@@ -138,23 +139,23 @@
 }
 
 /* Posicionamento do modal baseado na posição do botão */
-.ilibras-widget-bottom-right .ilibras-widget-modal,
-#ilibras-widget-container .ilibras-widget-bottom-left .ilibras-widget-modal {
+#ilibras-widget-container.ilibras-widget-bottom-right .ilibras-widget-modal,
+#ilibras-widget-container.ilibras-widget-bottom-left .ilibras-widget-modal {
   bottom: 105px;
 }
 
-.ilibras-widget-top-right .ilibras-widget-modal,
-#ilibras-widget-container .ilibras-widget-top-left .ilibras-widget-modal {
+#ilibras-widget-container.ilibras-widget-top-right .ilibras-widget-modal,
+#ilibras-widget-container.ilibras-widget-top-left .ilibras-widget-modal {
   top: 105px;
 }
 
-.ilibras-widget-bottom-right .ilibras-widget-modal,
-#ilibras-widget-container .ilibras-widget-top-right .ilibras-widget-modal {
+#ilibras-widget-container.ilibras-widget-bottom-right .ilibras-widget-modal,
+#ilibras-widget-container.ilibras-widget-top-right .ilibras-widget-modal {
   right: 0;
 }
 
-.ilibras-widget-bottom-left .ilibras-widget-modal,
-#ilibras-widget-container .ilibras-widget-top-left .ilibras-widget-modal {
+#ilibras-widget-container.ilibras-widget-bottom-left .ilibras-widget-modal,
+#ilibras-widget-container.ilibras-widget-top-left .ilibras-widget-modal {
   left: 0;
 }
 
@@ -248,7 +249,7 @@
   padding-left: 4px;
 }
 
-.ilibras-widget-form-group input[type="text"],
+#ilibras-widget-container .ilibras-widget-form-group input[type="text"],
 #ilibras-widget-container .ilibras-widget-form-group input[type="tel"] {
   background: #ffffff;
   border: 1px solid rgba(20,30,45,0.06);
@@ -257,7 +258,7 @@
   border-radius: 8px;
 }
 
-.ilibras-widget-form-group input[type="text"]:focus,
+#ilibras-widget-container .ilibras-widget-form-group input[type="text"]:focus,
 #ilibras-widget-container .ilibras-widget-form-group input[type="tel"]:focus {
   background: white;
   border-color: #357ABD;
@@ -265,7 +266,7 @@
   outline: none;
 }
 
-.ilibras-widget-form-group input[type="text"]::placeholder,
+#ilibras-widget-container .ilibras-widget-form-group input[type="text"]::placeholder,
 #ilibras-widget-container .ilibras-widget-form-group input[type="tel"]::placeholder {
   color: #6c757d;
 }
@@ -365,15 +366,15 @@
     max-width: 100%;
   }
 
-  .ilibras-widget-bottom-right,
-  #ilibras-widget-container .ilibras-widget-bottom-left {
+  #ilibras-widget-container.ilibras-widget-bottom-right,
+  #ilibras-widget-container.ilibras-widget-bottom-left {
     bottom: 20px;
     left: 20px !important;
     right: 20px !important;
   }
 
-  .ilibras-widget-top-right,
-  #ilibras-widget-container .ilibras-widget-top-left {
+  #ilibras-widget-container.ilibras-widget-top-right,
+  #ilibras-widget-container.ilibras-widget-top-left {
     top: 20px;
     left: 20px !important;
     right: 20px !important;
@@ -407,8 +408,8 @@
   }
 }
 
-.ilibras-widget-button:focus-visible,
-.ilibras-widget-close:focus-visible,
+#ilibras-widget-container .ilibras-widget-button:focus-visible,
+#ilibras-widget-container .ilibras-widget-close:focus-visible,
 #ilibras-widget-container .ilibras-widget-submit:focus-visible {
   outline: 3px solid rgba(53,122,189,0.18);
   outline-offset: 3px;
@@ -433,8 +434,8 @@
 /* Estados de erro: ver o bloco de acessibilidade no fim do arquivo. */
 
 /* Accessibilidade */
-.ilibras-widget-button:focus-visible,
-.ilibras-widget-close:focus-visible,
+#ilibras-widget-container .ilibras-widget-button:focus-visible,
+#ilibras-widget-container .ilibras-widget-close:focus-visible,
 #ilibras-widget-container .ilibras-widget-submit:focus-visible {
   outline: 3px solid #4A90E2;
   outline-offset: 2px;
@@ -459,14 +460,14 @@
     color: #b0b0b0;
   }
 
-  .ilibras-widget-form-group input[type="text"],
+  #ilibras-widget-container .ilibras-widget-form-group input[type="text"],
   #ilibras-widget-container .ilibras-widget-form-group input[type="tel"] {
     background: #363636;
     border-color: #4a4a4a;
     color: #e0e0e0;
   }
 
-  .ilibras-widget-form-group input[type="text"]::placeholder,
+  #ilibras-widget-container .ilibras-widget-form-group input[type="text"]::placeholder,
   #ilibras-widget-container .ilibras-widget-form-group input[type="tel"]::placeholder {
     color: #6c6c6c;
   }
@@ -615,11 +616,11 @@
 
 /* Foco visível em tudo que recebe foco, inclusive campos — o :focus original
    trocava a sombra, que some em alto contraste. */
-.ilibras-widget-button:focus-visible,
-.ilibras-widget-close:focus-visible,
-.ilibras-widget-submit:focus-visible,
-.ilibras-widget-form-group input:focus-visible,
-.ilibras-widget-checkbox-label input:focus-visible,
+#ilibras-widget-container .ilibras-widget-button:focus-visible,
+#ilibras-widget-container .ilibras-widget-close:focus-visible,
+#ilibras-widget-container .ilibras-widget-submit:focus-visible,
+#ilibras-widget-container .ilibras-widget-form-group input:focus-visible,
+#ilibras-widget-container .ilibras-widget-checkbox-label input:focus-visible,
 #ilibras-widget-container .ilibras-widget-fallback a:focus-visible {
   outline: 3px solid #1f4f7a;
   outline-offset: 2px;
@@ -628,16 +629,16 @@
 /* Windows em alto contraste remove cor de fundo e borda sutil: sem isto o
    campo e o botão ficam sem contorno. */
 @media (forced-colors: active) {
-  .ilibras-widget-modal,
-  .ilibras-widget-form-group input,
-  .ilibras-widget-submit,
+  #ilibras-widget-container .ilibras-widget-modal,
+  #ilibras-widget-container .ilibras-widget-form-group input,
+  #ilibras-widget-container .ilibras-widget-submit,
   #ilibras-widget-container .ilibras-widget-aviso {
     border: 1px solid CanvasText;
   }
 
-  .ilibras-widget-button:focus-visible,
-  .ilibras-widget-close:focus-visible,
-  .ilibras-widget-submit:focus-visible,
+  #ilibras-widget-container .ilibras-widget-button:focus-visible,
+  #ilibras-widget-container .ilibras-widget-close:focus-visible,
+  #ilibras-widget-container .ilibras-widget-submit:focus-visible,
   #ilibras-widget-container .ilibras-widget-form-group input:focus-visible {
     outline: 3px solid Highlight;
   }
@@ -647,23 +648,23 @@
    das pessoas com sensibilidade vestibular, isso causa mal-estar. */
 @media (prefers-reduced-motion: reduce) {
   #ilibras-widget-container,
-  .ilibras-widget-modal,
-  .ilibras-widget-submit,
-  .ilibras-widget-close,
+  #ilibras-widget-container .ilibras-widget-modal,
+  #ilibras-widget-container .ilibras-widget-submit,
+  #ilibras-widget-container .ilibras-widget-close,
   #ilibras-widget-container .ilibras-widget-badge {
     animation: none !important;
     transition: none !important;
   }
 
-  .ilibras-widget-submit:hover,
+  #ilibras-widget-container .ilibras-widget-submit:hover,
   #ilibras-widget-container .ilibras-widget-close:hover {
     transform: none;
   }
 }
 
 @media (prefers-color-scheme: dark) {
-  .ilibras-widget-legenda,
-  .ilibras-widget-dica,
+  #ilibras-widget-container .ilibras-widget-legenda,
+  #ilibras-widget-container .ilibras-widget-dica,
   #ilibras-widget-container .ilibras-widget-status {
     color: #c9c9c9;
   }
