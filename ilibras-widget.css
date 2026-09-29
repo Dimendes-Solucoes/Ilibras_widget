@@ -350,6 +350,42 @@
   text-align: center;
 }
 
+/* Aviso de saída para o iLibras: toma o lugar do formulário até a pessoa
+   confirmar ou voltar. O atributo hidden precisa de regra própria nos dois —
+   o display: flex de cada um venceria o atributo, e os dois apareceriam
+   juntos. (Sem crase nos comentários deste arquivo: ele é embutido num
+   template literal do JS, e uma crase aqui muda a forma do build inteiro.) */
+#ilibras-widget-container .ilibras-widget-form[hidden],
+#ilibras-widget-container .ilibras-widget-confirmacao[hidden] {
+  display: none !important;
+}
+
+#ilibras-widget-container .ilibras-widget-confirmacao {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#ilibras-widget-container .ilibras-widget-confirmacao-titulo {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #073657;
+}
+
+#ilibras-widget-container .ilibras-widget-confirmacao-texto {
+  margin: 0 0 6px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #495057;
+}
+
+/* "Voltar" tem o visual do botão de agendar, sem a margem que o cola à dica. */
+#ilibras-widget-container .ilibras-widget-confirmacao .ilibras-widget-agendar {
+  margin-top: 0;
+}
+
 /* Responsividade */
 @media (max-width: 480px) {
   #ilibras-widget-container .ilibras-widget-modal {
@@ -598,10 +634,11 @@
   font-weight: 600;
 }
 
+/* Fora do formulário desde a v1.6.0, então a distância vem daqui e não do gap. */
 #ilibras-widget-container .ilibras-widget-status {
   font-size: 13px;
   color: #495057;
-  margin: 0;
+  margin: 14px 0 0;
   min-height: 1em;
 }
 
@@ -610,6 +647,7 @@
 #ilibras-widget-container .ilibras-widget-button:focus-visible,
 #ilibras-widget-container .ilibras-widget-close:focus-visible,
 #ilibras-widget-container .ilibras-widget-submit:focus-visible,
+#ilibras-widget-container .ilibras-widget-agendar:focus-visible,
 #ilibras-widget-container .ilibras-widget-form-group input:focus-visible,
 #ilibras-widget-container .ilibras-widget-checkbox-label input:focus-visible,
 #ilibras-widget-container .ilibras-widget-fallback a:focus-visible {
@@ -630,6 +668,7 @@
   #ilibras-widget-container .ilibras-widget-button:focus-visible,
   #ilibras-widget-container .ilibras-widget-close:focus-visible,
   #ilibras-widget-container .ilibras-widget-submit:focus-visible,
+  #ilibras-widget-container .ilibras-widget-agendar:focus-visible,
   #ilibras-widget-container .ilibras-widget-form-group input:focus-visible {
     outline: 3px solid Highlight;
   }
@@ -683,8 +722,13 @@
     color: #9ecbff;
   }
 
-  #ilibras-widget-container .ilibras-widget-title {
+  #ilibras-widget-container .ilibras-widget-title,
+  #ilibras-widget-container .ilibras-widget-confirmacao-titulo {
     color: #e6f0f8;
+  }
+
+  #ilibras-widget-container .ilibras-widget-confirmacao-texto {
+    color: #c9c9c9;
   }
 
   #ilibras-widget-container .ilibras-widget-header {

@@ -42,6 +42,15 @@ export interface ILibrasConfig {
     /** Texto do botão de agendamento. Padrão: `'Agendar uma conversa'`. */
     scheduleButtonText?: string;
 
+    /**
+     * Avisa que a pessoa vai para o site do iLibras, numa aba nova, e espera a
+     * confirmação antes de criar o atendimento. Padrão: `true`.
+     *
+     * Com `false`, o widget volta ao comportamento anterior à v1.6.0: cria o
+     * atendimento e abre o iLibras direto do botão.
+     */
+    confirmarRedirecionamento?: boolean;
+
     /** Empilhamento. Padrão: `9999`. */
     zIndex?: number;
 

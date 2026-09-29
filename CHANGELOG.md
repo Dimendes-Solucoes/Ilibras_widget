@@ -4,6 +4,57 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 ---
 
+## [1.6.0] - 2026-09-29
+
+### 🧭 Avisa antes de levar a pessoa para o iLibras
+
+Ao clicar em **Iniciar atendimento em Libras** ou em **Agendar uma conversa**,
+o widget agora mostra, no lugar do formulário, o aviso de que a pessoa será
+redirecionada para o iLibras — numa aba nova — e só segue quando ela confirma
+em **Continuar para o iLibras**. **Voltar** (ou Esc) devolve o formulário com o
+nome ainda preenchido.
+
+O atendimento só é criado **depois** do "sim". Criar antes e perguntar depois
+deixaria um atendimento órfão na fila de quem desistiu — com o alarme dos
+intérpretes tocando para ninguém.
+
+### 🗂️ A aba nova abre dentro do clique
+
+A aba do iLibras passa a ser aberta no próprio clique de confirmação, em
+branco ("Abrindo o iLibras…"), e só recebe o endereço quando o atendimento
+volta criado. Antes ela era aberta depois da resposta da API — e `window.open`
+depois de um `await` já não conta como gesto do usuário, que é quando o
+bloqueador de pop-up age. Se a criação falhar, a aba reservada é fechada e a
+pessoa volta ao formulário, onde está a explicação do que houve. O plano B de
+sempre (trocar a página da aba atual) continua valendo para quando nem a aba
+do clique é permitida.
+
+### ⚙️ Nova opção: `confirmarRedirecionamento`
+
+Ligada por padrão. Com `false`, o widget se comporta como antes da 1.6.0: o
+botão cria o atendimento e abre o iLibras direto.
+
+### ♿ Acessibilidade
+
+- O aviso é um `alertdialog` com título e texto ligados: ao receber o foco, o
+  leitor de tela lê os dois antes do botão.
+- O foco vai para **Continuar** ao abrir o aviso e volta ao botão que a pessoa
+  tinha apertado ao sair dele.
+- A região de status saiu de dentro do formulário: escondida junto com ele
+  durante o aviso, deixaria de anunciar o andamento do envio.
+- O botão de contorno (agendar, e agora também **Voltar**) ganhou foco visível
+  próprio, inclusive em alto contraste — antes dependia do padrão do navegador.
+
+### 🧪 Testes
+
+`tests/confirmacao.test.mjs` exercita o fluxo na build publicada, com rede e
+janelas simuladas: nada enviado antes da confirmação, aba aberta antes da
+requisição, aba fechada na falha, clique duplo criando um atendimento só.
+Rodada contra a 1.5.3, a suíte reprova em 9 de 10 casos — o único que passa é
+o da opção desligada, que é justamente o comportamento antigo.
+
+---
+
 ## [1.5.3] - 2026-09-18
 
 ### 🩹 Conserta o widget que sumiu da tela na 1.5.1

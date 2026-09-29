@@ -168,6 +168,7 @@ new ILibrasWidget({
 | `buttonText` | `string` | `'Iniciar atendimento em Libras'` | Texto do botão de envio |
 | `agendamento` | `boolean` | `true` | Mostra o segundo botão, que leva direto à escolha de data e horário em vez da fila ao vivo. Deixe `false` em site que só atende ao vivo |
 | `scheduleButtonText` | `string` | `'Agendar uma conversa'` | Texto do botão de agendamento |
+| `confirmarRedirecionamento` | `boolean` | `true` | Avisa que a pessoa vai para o site do iLibras, numa aba nova, e só cria o atendimento depois que ela confirma. Com `false`, o botão cria o atendimento e abre o iLibras direto, como antes da v1.6.0 |
 | `token` | `string` | `''` | **OBRIGATÓRIO** — token de autenticação da API |
 | `zIndex` | `number` | `9999` | Z-index do widget |
 | `apiUrl` | `string` | endpoint de produção | Endpoint de cadastro. Troque apenas para apontar a um ambiente de homologação |

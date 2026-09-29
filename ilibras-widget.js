@@ -1,5 +1,5 @@
 /*!
- * iLibras Widget v1.5.3
+ * iLibras Widget v1.6.0
  * https://github.com/Dimendes-Solucoes/Ilibras_widget
  * Licença MIT
  *
@@ -359,6 +359,42 @@
   text-align: center;
 }
 
+/* Aviso de saída para o iLibras: toma o lugar do formulário até a pessoa
+   confirmar ou voltar. O atributo hidden precisa de regra própria nos dois —
+   o display: flex de cada um venceria o atributo, e os dois apareceriam
+   juntos. (Sem crase nos comentários deste arquivo: ele é embutido num
+   template literal do JS, e uma crase aqui muda a forma do build inteiro.) */
+#ilibras-widget-container .ilibras-widget-form[hidden],
+#ilibras-widget-container .ilibras-widget-confirmacao[hidden] {
+  display: none !important;
+}
+
+#ilibras-widget-container .ilibras-widget-confirmacao {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#ilibras-widget-container .ilibras-widget-confirmacao-titulo {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #073657;
+}
+
+#ilibras-widget-container .ilibras-widget-confirmacao-texto {
+  margin: 0 0 6px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #495057;
+}
+
+/* "Voltar" tem o visual do botão de agendar, sem a margem que o cola à dica. */
+#ilibras-widget-container .ilibras-widget-confirmacao .ilibras-widget-agendar {
+  margin-top: 0;
+}
+
 /* Responsividade */
 @media (max-width: 480px) {
   #ilibras-widget-container .ilibras-widget-modal {
@@ -607,10 +643,11 @@
   font-weight: 600;
 }
 
+/* Fora do formulário desde a v1.6.0, então a distância vem daqui e não do gap. */
 #ilibras-widget-container .ilibras-widget-status {
   font-size: 13px;
   color: #495057;
-  margin: 0;
+  margin: 14px 0 0;
   min-height: 1em;
 }
 
@@ -619,6 +656,7 @@
 #ilibras-widget-container .ilibras-widget-button:focus-visible,
 #ilibras-widget-container .ilibras-widget-close:focus-visible,
 #ilibras-widget-container .ilibras-widget-submit:focus-visible,
+#ilibras-widget-container .ilibras-widget-agendar:focus-visible,
 #ilibras-widget-container .ilibras-widget-form-group input:focus-visible,
 #ilibras-widget-container .ilibras-widget-checkbox-label input:focus-visible,
 #ilibras-widget-container .ilibras-widget-fallback a:focus-visible {
@@ -639,6 +677,7 @@
   #ilibras-widget-container .ilibras-widget-button:focus-visible,
   #ilibras-widget-container .ilibras-widget-close:focus-visible,
   #ilibras-widget-container .ilibras-widget-submit:focus-visible,
+  #ilibras-widget-container .ilibras-widget-agendar:focus-visible,
   #ilibras-widget-container .ilibras-widget-form-group input:focus-visible {
     outline: 3px solid Highlight;
   }
@@ -692,8 +731,13 @@
     color: #9ecbff;
   }
 
-  #ilibras-widget-container .ilibras-widget-title {
+  #ilibras-widget-container .ilibras-widget-title,
+  #ilibras-widget-container .ilibras-widget-confirmacao-titulo {
     color: #e6f0f8;
+  }
+
+  #ilibras-widget-container .ilibras-widget-confirmacao-texto {
+    color: #c9c9c9;
   }
 
   #ilibras-widget-container .ilibras-widget-header {
@@ -723,6 +767,10 @@
     // uma agenda que ninguém cobre é pior do que não ter o botão.
     agendamento: true,
     scheduleButtonText: "Agendar uma conversa",
+    // Avisa que a pessoa vai sair do site para o iLibras e espera a confirmação
+    // antes de criar o atendimento. Sair do site em que se estava, para uma aba
+    // nova, sem saber antes, desorienta — sobretudo quem usa leitor de tela.
+    confirmarRedirecionamento: true,
     token: "",
     zIndex: 9999,
     apiUrl: "https://sistema.ilibras.com.br/api/public/widget/cadastrar",
@@ -753,6 +801,7 @@
       this.enviando = false;
       this.abertoEm = null;
       this.focoAnterior = null;
+      this.modoPendente = null;
       this.init();
     }
     init() {
@@ -855,10 +904,30 @@
             <span class="ilibras-widget-dica ilibras-widget-dica-agendar" id="ilibras-widget-agendar-dica">
               Escolha data e horário em vez de esperar na fila.
             </span>` : ""}
-
-            <!-- Estado do envio, anunciado sem roubar o foco de quem digita. -->
-            <p class="ilibras-widget-status" id="ilibras-widget-status" role="status" aria-live="polite"></p>
           </form>
+
+          <!-- Aviso de saída do site. Ocupa o lugar do formulário em vez de
+               abrir uma janela por cima: o diálogo já é modal, e um segundo
+               diálogo empilhado confunde quem navega por leitor de tela. -->
+          <div id="ilibras-widget-confirmacao" class="ilibras-widget-confirmacao" role="alertdialog"
+               aria-labelledby="ilibras-widget-confirmacao-titulo"
+               aria-describedby="ilibras-widget-confirmacao-texto" hidden>
+            <h3 class="ilibras-widget-confirmacao-titulo" id="ilibras-widget-confirmacao-titulo">
+              Você será redirecionado para o iLibras
+            </h3>
+            <p class="ilibras-widget-confirmacao-texto" id="ilibras-widget-confirmacao-texto"></p>
+            <button type="button" id="ilibras-widget-confirmar" class="ilibras-widget-submit">
+              Continuar para o iLibras
+            </button>
+            <button type="button" id="ilibras-widget-voltar" class="ilibras-widget-agendar">
+              Voltar
+            </button>
+          </div>
+
+          <!-- Estado do envio, anunciado sem roubar o foco de quem digita. Fica
+               fora do formulário: escondido junto com ele durante o aviso de
+               saída, o leitor de tela deixaria de anunciar o que acontece. -->
+          <p class="ilibras-widget-status" id="ilibras-widget-status" role="status" aria-live="polite"></p>
         </div>
       </div>
     `;
@@ -871,6 +940,10 @@
       this.agendar = container.querySelector("#ilibras-widget-agendar");
       this.aviso = container.querySelector("#ilibras-widget-aviso");
       this.status = container.querySelector("#ilibras-widget-status");
+      this.confirmacao = container.querySelector("#ilibras-widget-confirmacao");
+      this.confirmacaoTexto = container.querySelector("#ilibras-widget-confirmacao-texto");
+      this.confirmar = container.querySelector("#ilibras-widget-confirmar");
+      this.voltar = container.querySelector("#ilibras-widget-voltar");
     }
     escapar(texto) {
       const div = document.createElement("div");
@@ -883,6 +956,10 @@
       this.modal.addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
           e.stopPropagation();
+          if (!this.confirmacao.hidden) {
+            if (!this.enviando) this.cancelarConfirmacao();
+            return;
+          }
           this.closeWidget();
           return;
         }
@@ -898,6 +975,8 @@
       if (this.agendar) {
         this.agendar.addEventListener("click", (e) => this.handleSubmit(e, "agendamento"));
       }
+      this.confirmar.addEventListener("click", () => this.confirmarRedirecionamento());
+      this.voltar.addEventListener("click", () => this.cancelarConfirmacao());
     }
     prenderFoco(evento) {
       const focaveis = Array.from(this.modal.querySelectorAll(FOCAVEIS)).filter((el) => el.offsetParent !== null || el === document.activeElement);
@@ -927,6 +1006,7 @@
       this.container.querySelector("#ilibras-name").focus();
     }
     closeWidget() {
+      this.mostrarFormulario();
       this.modal.classList.remove("ilibras-widget-modal-open");
       this.botao.classList.remove("ilibras-widget-button-open");
       this.botao.setAttribute("aria-expanded", "false");
@@ -1094,6 +1174,85 @@
         invalido.focus();
         return;
       }
+      if (this.config.confirmarRedirecionamento) {
+        this.pedirConfirmacao(modo);
+        return;
+      }
+      await this.criarAtendimento(modo);
+    }
+    // ─── Aviso de saída ─────────────────────────────────────────────────────
+    /**
+     * Troca o formulário pelo aviso de que a pessoa vai para o iLibras. Nada é
+     * enviado ainda: o atendimento só nasce no "Continuar".
+     */
+    pedirConfirmacao(modo) {
+      this.modoPendente = modo;
+      this.confirmacaoTexto.textContent = modo === "agendamento" ? "O agendamento é feito no site do iLibras, que abre em uma nova aba. Lá você escolhe o dia e o horário da conversa." : "O atendimento em Libras acontece no site do iLibras, que abre em uma nova aba. Lá você entra na fila e aguarda um intérprete.";
+      this.confirmar.textContent = "Continuar para o iLibras";
+      this.form.hidden = true;
+      this.confirmacao.hidden = false;
+      this.anunciar("");
+      this.confirmar.focus();
+    }
+    /** "Voltar": o formulário reaparece como estava, com o nome digitado. */
+    cancelarConfirmacao() {
+      if (this.enviando) return;
+      const modo = this.modoPendente;
+      this.mostrarFormulario();
+      const origem = modo === "agendamento" && this.agendar ? this.agendar : this.submit;
+      origem.focus();
+    }
+    mostrarFormulario() {
+      this.modoPendente = null;
+      this.confirmacao.hidden = true;
+      this.form.hidden = false;
+    }
+    async confirmarRedirecionamento() {
+      if (this.enviando || !this.modoPendente) return;
+      const aba = this.reservarAba();
+      await this.criarAtendimento(this.modoPendente, aba);
+    }
+    /**
+     * Abre uma aba em branco para receber o iLibras assim que o atendimento
+     * existir. Devolve null quando o navegador barra — aí vale o caminho antigo.
+     */
+    reservarAba() {
+      let aba = null;
+      try {
+        aba = window.open("", "_blank");
+      } catch (e) {
+        aba = null;
+      }
+      if (!aba) return null;
+      aba.opener = null;
+      try {
+        const doc = aba.document;
+        doc.title = "Abrindo o iLibras…";
+        doc.documentElement.lang = "pt-BR";
+        doc.body.style.cssText = "font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;padding:32px;color:#073657";
+        doc.body.textContent = "Abrindo o iLibras…";
+      } catch (e) {
+      }
+      return aba;
+    }
+    /**
+     * Leva a pessoa ao endereço devolvido pelo iLibras: na aba reservada quando
+     * ela existe, numa aba nova quando não, e na atual como último recurso.
+     */
+    irPara(destino, abaReservada) {
+      if (abaReservada && !abaReservada.closed) {
+        abaReservada.location.href = destino;
+        return;
+      }
+      const aba = window.open(destino, "_blank");
+      if (aba) {
+        aba.opener = null;
+      } else {
+        window.location.assign(destino);
+      }
+    }
+    // ─── Criação do atendimento ─────────────────────────────────────────────
+    async criarAtendimento(modo, abaReservada = null) {
       const v = this.valores();
       const corpo = new FormData();
       corpo.append("nome", v.nome);
@@ -1106,15 +1265,17 @@
         const destino = resultado.link_fila || resultado.link || resultado.url || resultado.redirect;
         if (!destino) throw new FalhaDeServico("resposta_inesperada");
         this.anunciar(modo === "agendamento" ? "Cadastro feito. Abrindo o calendário para escolher data e horário." : "Atendimento criado. Abrindo a sala de atendimento.");
-        const aba = window.open(destino, "_blank");
-        if (aba) {
-          aba.opener = null;
-        } else {
-          window.location.assign(destino);
-        }
+        this.irPara(destino, abaReservada);
         this.form.reset();
         this.closeWidget();
       } catch (erro) {
+        if (abaReservada && !abaReservada.closed) {
+          try {
+            abaReservada.close();
+          } catch (e) {
+          }
+        }
+        this.mostrarFormulario();
         this.tratarFalha(erro);
       } finally {
         this.travarEnvio(false, modo);
@@ -1122,14 +1283,25 @@
     }
     travarEnvio(travado, modo = "fila") {
       this.enviando = travado;
-      for (const botao of [this.submit, this.agendar]) {
+      for (const botao of [this.submit, this.agendar, this.confirmar, this.voltar]) {
         if (botao) botao.disabled = travado;
       }
-      const usouAgendar = modo === "agendamento" && this.agendar;
-      const ativo = usouAgendar ? this.agendar : this.submit;
-      const rotulo = usouAgendar ? this.config.scheduleButtonText : this.config.buttonText;
+      let ativo;
+      let rotulo;
+      if (!this.confirmacao.hidden) {
+        ativo = this.confirmar;
+        rotulo = "Continuar para o iLibras";
+      } else {
+        const usouAgendar = modo === "agendamento" && this.agendar;
+        ativo = usouAgendar ? this.agendar : this.submit;
+        rotulo = usouAgendar ? this.config.scheduleButtonText : this.config.buttonText;
+      }
       ativo.setAttribute("aria-busy", travado ? "true" : "false");
       ativo.textContent = travado ? "Enviando..." : rotulo;
+      if (!travado) {
+        this.confirmar.setAttribute("aria-busy", "false");
+        this.confirmar.textContent = "Continuar para o iLibras";
+      }
       if (travado) this.anunciar("Enviando seus dados. Aguarde.");
     }
     /**

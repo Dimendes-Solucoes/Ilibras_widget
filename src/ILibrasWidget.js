@@ -17,6 +17,11 @@
  * Desde a v1.5.0 o formulário pede só o nome. CPF e telefone saíram: para
  * chamar um intérprete não é preciso identificar a pessoa, e todo campo a mais
  * é uma barreira a quem só quer ser atendido.
+ *
+ * Desde a v1.6.0 o widget avisa antes de levar a pessoa para o iLibras, e só
+ * cria o atendimento depois do "sim". Criar antes e perguntar depois deixaria
+ * um atendimento órfão na fila de quem desistiu — com o alarme dos
+ * intérpretes tocando para ninguém.
  */
 import { CSS, LOGO } from './assets-gerados.js';
 
@@ -34,6 +39,11 @@ const defaultConfig = {
   // uma agenda que ninguém cobre é pior do que não ter o botão.
   agendamento: true,
   scheduleButtonText: 'Agendar uma conversa',
+
+  // Avisa que a pessoa vai sair do site para o iLibras e espera a confirmação
+  // antes de criar o atendimento. Sair do site em que se estava, para uma aba
+  // nova, sem saber antes, desorienta — sobretudo quem usa leitor de tela.
+  confirmarRedirecionamento: true,
 
   token: '',
   zIndex: 9999,
@@ -72,6 +82,8 @@ class ILibrasWidget {
     this.enviando = false;
     this.abertoEm = null;
     this.focoAnterior = null;
+    // Qual botão levou à confirmação: 'fila' ou 'agendamento'.
+    this.modoPendente = null;
     this.init();
   }
 
@@ -181,10 +193,30 @@ class ILibrasWidget {
             <span class="ilibras-widget-dica ilibras-widget-dica-agendar" id="ilibras-widget-agendar-dica">
               Escolha data e horário em vez de esperar na fila.
             </span>` : ''}
-
-            <!-- Estado do envio, anunciado sem roubar o foco de quem digita. -->
-            <p class="ilibras-widget-status" id="ilibras-widget-status" role="status" aria-live="polite"></p>
           </form>
+
+          <!-- Aviso de saída do site. Ocupa o lugar do formulário em vez de
+               abrir uma janela por cima: o diálogo já é modal, e um segundo
+               diálogo empilhado confunde quem navega por leitor de tela. -->
+          <div id="ilibras-widget-confirmacao" class="ilibras-widget-confirmacao" role="alertdialog"
+               aria-labelledby="ilibras-widget-confirmacao-titulo"
+               aria-describedby="ilibras-widget-confirmacao-texto" hidden>
+            <h3 class="ilibras-widget-confirmacao-titulo" id="ilibras-widget-confirmacao-titulo">
+              Você será redirecionado para o iLibras
+            </h3>
+            <p class="ilibras-widget-confirmacao-texto" id="ilibras-widget-confirmacao-texto"></p>
+            <button type="button" id="ilibras-widget-confirmar" class="ilibras-widget-submit">
+              Continuar para o iLibras
+            </button>
+            <button type="button" id="ilibras-widget-voltar" class="ilibras-widget-agendar">
+              Voltar
+            </button>
+          </div>
+
+          <!-- Estado do envio, anunciado sem roubar o foco de quem digita. Fica
+               fora do formulário: escondido junto com ele durante o aviso de
+               saída, o leitor de tela deixaria de anunciar o que acontece. -->
+          <p class="ilibras-widget-status" id="ilibras-widget-status" role="status" aria-live="polite"></p>
         </div>
       </div>
     `;
@@ -199,6 +231,10 @@ class ILibrasWidget {
     this.agendar = container.querySelector('#ilibras-widget-agendar');
     this.aviso = container.querySelector('#ilibras-widget-aviso');
     this.status = container.querySelector('#ilibras-widget-status');
+    this.confirmacao = container.querySelector('#ilibras-widget-confirmacao');
+    this.confirmacaoTexto = container.querySelector('#ilibras-widget-confirmacao-texto');
+    this.confirmar = container.querySelector('#ilibras-widget-confirmar');
+    this.voltar = container.querySelector('#ilibras-widget-voltar');
   }
 
   escapar(texto) {
@@ -217,6 +253,13 @@ class ILibrasWidget {
     this.modal.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         e.stopPropagation();
+        // Esc desfaz o passo mais recente, como em qualquer diálogo: no aviso
+        // de saída, volta ao formulário em vez de fechar o widget inteiro e
+        // jogar fora o nome que a pessoa acabou de digitar.
+        if (!this.confirmacao.hidden) {
+          if (!this.enviando) this.cancelarConfirmacao();
+          return;
+        }
         this.closeWidget();
         return;
       }
@@ -239,6 +282,9 @@ class ILibrasWidget {
     if (this.agendar) {
       this.agendar.addEventListener('click', (e) => this.handleSubmit(e, 'agendamento'));
     }
+
+    this.confirmar.addEventListener('click', () => this.confirmarRedirecionamento());
+    this.voltar.addEventListener('click', () => this.cancelarConfirmacao());
   }
 
   prenderFoco(evento) {
@@ -281,6 +327,10 @@ class ILibrasWidget {
   }
 
   closeWidget() {
+    // Quem fecha no meio do aviso e reabre depois encontra o formulário, não
+    // uma pergunta sobre um envio que já não lembra de ter pedido.
+    this.mostrarFormulario();
+
     this.modal.classList.remove('ilibras-widget-modal-open');
     this.botao.classList.remove('ilibras-widget-button-open');
     this.botao.setAttribute('aria-expanded', 'false');
@@ -489,6 +539,131 @@ class ILibrasWidget {
       return;
     }
 
+    if (this.config.confirmarRedirecionamento) {
+      this.pedirConfirmacao(modo);
+      return;
+    }
+
+    await this.criarAtendimento(modo);
+  }
+
+  // ─── Aviso de saída ─────────────────────────────────────────────────────
+
+  /**
+   * Troca o formulário pelo aviso de que a pessoa vai para o iLibras. Nada é
+   * enviado ainda: o atendimento só nasce no "Continuar".
+   */
+  pedirConfirmacao(modo) {
+    this.modoPendente = modo;
+
+    this.confirmacaoTexto.textContent = modo === 'agendamento'
+      ? 'O agendamento é feito no site do iLibras, que abre em uma nova aba. Lá você escolhe o dia e o horário da conversa.'
+      : 'O atendimento em Libras acontece no site do iLibras, que abre em uma nova aba. Lá você entra na fila e aguarda um intérprete.';
+    this.confirmar.textContent = 'Continuar para o iLibras';
+
+    this.form.hidden = true;
+    this.confirmacao.hidden = false;
+    this.anunciar('');
+
+    // O foco vai para a ação principal. Entrar num alertdialog faz o leitor
+    // de tela ler título e texto antes do botão, então o aviso não passa batido.
+    this.confirmar.focus();
+  }
+
+  /** "Voltar": o formulário reaparece como estava, com o nome digitado. */
+  cancelarConfirmacao() {
+    if (this.enviando) return;
+
+    const modo = this.modoPendente;
+    this.mostrarFormulario();
+
+    // O foco volta para o botão que a pessoa tinha apertado, não para o topo.
+    const origem = modo === 'agendamento' && this.agendar ? this.agendar : this.submit;
+    origem.focus();
+  }
+
+  mostrarFormulario() {
+    this.modoPendente = null;
+    this.confirmacao.hidden = true;
+    this.form.hidden = false;
+  }
+
+  async confirmarRedirecionamento() {
+    if (this.enviando || !this.modoPendente) return;
+
+    // A aba é aberta AQUI, ainda dentro do clique, e só depois recebe o
+    // endereço. window.open depois de um await já não conta como gesto do
+    // usuário, e é aí que o bloqueador de pop-up costuma agir — antes deste
+    // aviso, o widget contornava isso trocando a página da aba atual.
+    const aba = this.reservarAba();
+
+    await this.criarAtendimento(this.modoPendente, aba);
+  }
+
+  /**
+   * Abre uma aba em branco para receber o iLibras assim que o atendimento
+   * existir. Devolve null quando o navegador barra — aí vale o caminho antigo.
+   */
+  reservarAba() {
+    let aba = null;
+    try {
+      aba = window.open('', '_blank');
+    } catch (e) {
+      aba = null;
+    }
+    if (!aba) return null;
+
+    // A aba nova não precisa (e não deve) alcançar o site do cliente. É a
+    // mesma proteção de 'noopener', sem o efeito colateral de window.open
+    // devolver null — ver o comentário em irPara().
+    aba.opener = null;
+
+    // Enquanto o cadastro não volta, a aba diz o que está acontecendo em vez
+    // de ficar em branco.
+    try {
+      const doc = aba.document;
+      doc.title = 'Abrindo o iLibras…';
+      doc.documentElement.lang = 'pt-BR';
+      doc.body.style.cssText = 'font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;padding:32px;color:#073657';
+      doc.body.textContent = 'Abrindo o iLibras…';
+    } catch (e) {
+      // Aba sem documento acessível: segue em branco, e tudo bem.
+    }
+
+    return aba;
+  }
+
+  /**
+   * Leva a pessoa ao endereço devolvido pelo iLibras: na aba reservada quando
+   * ela existe, numa aba nova quando não, e na atual como último recurso.
+   */
+  irPara(destino, abaReservada) {
+    if (abaReservada && !abaReservada.closed) {
+      abaReservada.location.href = destino;
+      return;
+    }
+
+    // window.open depois de await pode cair no bloqueador de pop-up. Se
+    // cair, a mesma aba leva — melhor trocar de página do que sumir com o
+    // atendimento que já foi criado.
+    //
+    // Sem a feature 'noopener' de propósito: com ela, a especificação manda
+    // window.open devolver null MESMO quando a aba abre. O teste abaixo lia
+    // esse null como pop-up bloqueado e navegava a aba atual também — a
+    // pessoa ficava com duas. Anular `opener` na mão dá a mesma proteção e
+    // preserva o retorno, que é o que distingue aba aberta de aba barrada.
+    const aba = window.open(destino, '_blank');
+
+    if (aba) {
+      aba.opener = null;
+    } else {
+      window.location.assign(destino);
+    }
+  }
+
+  // ─── Criação do atendimento ─────────────────────────────────────────────
+
+  async criarAtendimento(modo, abaReservada = null) {
     const v = this.valores();
 
     const corpo = new FormData();
@@ -509,26 +684,19 @@ class ILibrasWidget {
         ? 'Cadastro feito. Abrindo o calendário para escolher data e horário.'
         : 'Atendimento criado. Abrindo a sala de atendimento.');
 
-      // window.open depois de await pode cair no bloqueador de pop-up. Se
-      // cair, a mesma aba leva — melhor trocar de página do que sumir com o
-      // atendimento que já foi criado.
-      //
-      // Sem a feature 'noopener' de propósito: com ela, a especificação manda
-      // window.open devolver null MESMO quando a aba abre. O teste abaixo lia
-      // esse null como pop-up bloqueado e navegava a aba atual também — a
-      // pessoa ficava com duas. Anular `opener` na mão dá a mesma proteção e
-      // preserva o retorno, que é o que distingue aba aberta de aba barrada.
-      const aba = window.open(destino, '_blank');
-
-      if (aba) {
-        aba.opener = null;
-      } else {
-        window.location.assign(destino);
-      }
+      this.irPara(destino, abaReservada);
 
       this.form.reset();
       this.closeWidget();
     } catch (erro) {
+      // A aba reservada não tem para onde ir: fechá-la devolve a pessoa a
+      // esta página, onde a explicação do que houve está esperando.
+      if (abaReservada && !abaReservada.closed) {
+        try { abaReservada.close(); } catch (e) { /* já fechada */ }
+      }
+
+      // O erro pode ser de validação do nome, e o campo mora no formulário.
+      this.mostrarFormulario();
       this.tratarFalha(erro);
     } finally {
       // O mesmo modo da ida: sem ele, destravar devolveria o texto ao botão
@@ -540,20 +708,35 @@ class ILibrasWidget {
   travarEnvio(travado, modo = 'fila') {
     this.enviando = travado;
 
-    // Os dois botões saem de cena: enquanto um cadastro está em curso, o
-    // outro caminho criaria um segundo atendimento para a mesma pessoa.
-    for (const botao of [this.submit, this.agendar]) {
+    // Todos os botões de envio saem de cena: enquanto um cadastro está em
+    // curso, qualquer outro caminho criaria um segundo atendimento para a
+    // mesma pessoa — e "Voltar" mostraria o formulário de um envio em curso.
+    for (const botao of [this.submit, this.agendar, this.confirmar, this.voltar]) {
       if (botao) botao.disabled = travado;
     }
 
     // Só o botão acionado muda de texto e recebe aria-busy — dizer que o
     // outro está ocupado seria mentira para quem usa leitor de tela.
-    const usouAgendar = modo === 'agendamento' && this.agendar;
-    const ativo = usouAgendar ? this.agendar : this.submit;
-    const rotulo = usouAgendar ? this.config.scheduleButtonText : this.config.buttonText;
+    let ativo;
+    let rotulo;
+    if (!this.confirmacao.hidden) {
+      ativo = this.confirmar;
+      rotulo = 'Continuar para o iLibras';
+    } else {
+      const usouAgendar = modo === 'agendamento' && this.agendar;
+      ativo = usouAgendar ? this.agendar : this.submit;
+      rotulo = usouAgendar ? this.config.scheduleButtonText : this.config.buttonText;
+    }
 
     ativo.setAttribute('aria-busy', travado ? 'true' : 'false');
     ativo.textContent = travado ? 'Enviando...' : rotulo;
+
+    // No caminho de falha o formulário volta antes de destravar, e o texto do
+    // botão de confirmar ficaria em "Enviando..." para a próxima vez.
+    if (!travado) {
+      this.confirmar.setAttribute('aria-busy', 'false');
+      this.confirmar.textContent = 'Continuar para o iLibras';
+    }
 
     if (travado) this.anunciar('Enviando seus dados. Aguarde.');
   }
