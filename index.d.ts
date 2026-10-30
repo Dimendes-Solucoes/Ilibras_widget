@@ -14,6 +14,8 @@ export interface ILibrasFallback {
     texto?: string;
 }
 
+export type ILibrasTema = 'auto' | 'claro' | 'escuro';
+
 export interface ILibrasConfig {
     /** Token de autenticação do contrato. **Obrigatório** — sem ele o widget não envia nada. */
     token: string;
@@ -50,6 +52,16 @@ export interface ILibrasConfig {
      * atendimento e abre o iLibras direto do botão.
      */
     confirmarRedirecionamento?: boolean;
+
+    /**
+     * Tema do widget. Padrão: `'auto'`.
+     *
+     * `'auto'` lê o fundo do site e acompanha quando ele muda — inclusive
+     * quando o site segue o modo escuro do sistema. No tema escuro o ícone
+     * fica branco. `'claro'` e `'escuro'` fixam o tema, para o site cujo fundo
+     * é um gradiente ou uma imagem, que o widget não consegue ler.
+     */
+    tema?: ILibrasTema;
 
     /** Empilhamento. Padrão: `9999`. */
     zIndex?: number;
@@ -103,6 +115,13 @@ export declare class ILibrasWidget {
     openWidget(): void;
     closeWidget(): void;
     toggleWidget(): void;
+
+    /**
+     * Troca o tema na hora. Para o site com botão de tema que o widget não
+     * percebe sozinho: `'claro'` e `'escuro'` fixam; `'auto'` volta a ler o
+     * fundo do site.
+     */
+    definirTema(tema: ILibrasTema): void;
 
     /**
      * Remove o widget e o estilo da página.

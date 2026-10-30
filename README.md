@@ -18,7 +18,7 @@ Widget de acessibilidade em Libras: um botão flutuante que leva a pessoa surda 
 - 🔒 **Envio seguro** - Dados enviados via POST para API
 - 🌐 **Universal** - Funciona em qualquer site ou sistema
 - ♿ **Acessível** - Suporte a leitores de tela e navegação por teclado
-- 🌙 **Tema escuro** - Adapta-se automaticamente às preferências do usuário
+- 🌙 **Tema claro e escuro** - Acompanha o fundo do site, e o ícone fica branco no tema escuro
 
 ## 📦 Instalação
 
@@ -169,6 +169,7 @@ new ILibrasWidget({
 | `agendamento` | `boolean` | `true` | Mostra o segundo botão, que leva direto à escolha de data e horário em vez da fila ao vivo. Deixe `false` em site que só atende ao vivo |
 | `scheduleButtonText` | `string` | `'Agendar uma conversa'` | Texto do botão de agendamento |
 | `confirmarRedirecionamento` | `boolean` | `true` | Avisa que a pessoa vai para o site do iLibras, numa aba nova, e só cria o atendimento depois que ela confirma. Com `false`, o botão cria o atendimento e abre o iLibras direto, como antes da v1.6.0 |
+| `tema` | `string` | `'auto'` | `'auto'` acompanha o fundo do site — inclusive quando o site segue o modo escuro do sistema. `'claro'` ou `'escuro'` fixam o tema. Ver [Tema claro e escuro](#tema-claro-e-escuro) |
 | `token` | `string` | `''` | **OBRIGATÓRIO** — token de autenticação da API |
 | `zIndex` | `number` | `9999` | Z-index do widget |
 | `apiUrl` | `string` | endpoint de produção | Endpoint de cadastro. Troque apenas para apontar a um ambiente de homologação |
@@ -360,6 +361,38 @@ Você pode sobrescrever os estilos padrão:
 }
 ```
 
+### Tema claro e escuro
+
+O widget lê a cor de fundo do site e escolhe o tema que aparece melhor sobre
+ela: no escuro, o ícone fica branco (o dourado da logo continua) e o formulário
+fica escuro. Ele acompanha a troca sem recarregar — o botão de tema do site, ou
+o sistema mudando de modo quando o site segue o sistema.
+
+> ✅ **Não precisa configurar nada.** Vem ligado por padrão (`tema: 'auto'`)
+> desde a v1.7.0. Quem já tem o widget instalado só precisa atualizar: o
+> pacote (`npm i ilibras-widget@latest`) ou o arquivo `ilibras-widget.js` — a
+> configuração continua a mesma.
+
+Para ver funcionando, abra `teste-modo-escuro.html` no navegador: ele troca o
+fundo do "site" e o tema do widget, com o envio simulado.
+
+Quem decide é o **fundo do site**, não a preferência do sistema: o ícone flutua
+sobre a página, e num site claro aberto num computador em modo escuro um ícone
+branco sumiria.
+
+O fundo lido é o do `<html>` e o do `<body>`. Se o site pinta o fundo com
+gradiente, imagem ou num elemento de dentro, fixe o tema:
+
+```javascript
+new ILibrasWidget({ token: 'SEU_TOKEN', tema: 'escuro' });
+
+// ou, num botão de tema que o widget não percebe sozinho:
+widget.definirTema('escuro');  // 'claro', 'escuro' ou 'auto'
+```
+
+No CSS, o tema escuro é a classe `.ilibras-widget-tema-escuro` no
+`#ilibras-widget-container`.
+
 ## 🔧 API JavaScript
 
 ### Métodos Públicos
@@ -375,6 +408,9 @@ widget.closeWidget();
 
 // Alternar estado (abrir/fechar)
 widget.toggleWidget();
+
+// Trocar o tema: 'claro', 'escuro' ou 'auto' (volta a seguir o site)
+widget.definirTema('escuro');
 
 // Destruir o widget e remover do DOM
 widget.destroy();
@@ -606,6 +642,7 @@ Ilibras_widget/
 ├── ilibras-widget.js        # GERADO: build de <script>, no endereço de sempre
 ├── index.d.ts               # Tipos TypeScript
 ├── exemplo.html             # Página de exemplo e demonstração
+├── teste-modo-escuro.html   # Teste manual do tema claro e escuro
 └── README.md                # Esta documentação
 ```
 

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-fundo="claro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iLibras Widget - Tema claro e escuro</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      /* Toda troca de fundo tem transição, como em muito site real: o widget
+         precisa esperar ela acabar para ler a cor certa. */
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    /* O "site" de teste: cada opção é um fundo diferente. */
+    html[data-fundo="claro"] body { background: #ffffff; color: #222; }
+    html[data-fundo="escuro"] body { background: #121212; color: #eee; }
+    html[data-fundo="marinho"] body { background: #0f172a; color: #e2e8f0; }
+    html[data-fundo="cinza"] body { background: #777777; color: #fff; }
+    html[data-fundo="azul"] body { background: #4A90E2; color: #fff; }
+    html[data-fundo="tailwind"] body { background: oklch(21% .034 264.665); color: #eee; }
+    html[data-fundo="sistema"] { color-scheme: light dark; }
+    html[data-fundo="sistema"] body { background: transparent; color: CanvasText; }
+    html[data-fundo="gradiente"] body { background: linear-gradient(135deg, #0b1020, #1e293b); color: #eee; }
+
+    .site {
+      max-width: 640px;
+      padding: 380px 40px 40px;
+      line-height: 1.6;
+    }
+
+    /* O painel tem cor própria para ficar legível em qualquer fundo. */
+    .painel {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      width: 420px;
+      max-width: calc(100vw - 32px);
+      background: #fff;
+      color: #222;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+      padding: 18px 20px;
+      font-size: 14px;
+      color-scheme: light;
+    }
+
+    .painel h1 { font-size: 17px; margin: 0 0 4px; }
+    .painel p { margin: 0 0 12px; color: #555; }
+    .painel fieldset { border: 1px solid #ddd; border-radius: 8px; margin: 0 0 12px; padding: 8px 12px; }
+    .painel legend { font-weight: 600; padding: 0 4px; }
+    .painel label { display: block; padding: 2px 0; cursor: pointer; }
+    .painel small { color: #777; }
+
+    .estado {
+      background: #f3f5f8;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-family: Consolas, monospace;
+      font-size: 13px;
+    }
+
+    .painel button {
+      margin-top: 10px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid #357ABD;
+      background: #357ABD;
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="painel">
+    <h1>🌙 Teste de tema claro e escuro</h1>
+    <p>Troque o fundo do "site" e veja o ícone no canto inferior direito. O envio é simulado: nada vai para o iLibras.</p>
+
+    <fieldset id="fundos">
+      <legend>Fundo do site</legend>
+      <label><input type="radio" name="fundo" value="claro" checked> Claro (branco)</label>
+      <label><input type="radio" name="fundo" value="escuro"> Escuro (#121212)</label>
+      <label><input type="radio" name="fundo" value="marinho"> Azul-marinho (#0f172a)</label>
+      <label><input type="radio" name="fundo" value="cinza"> Cinza médio (#777)</label>
+      <label><input type="radio" name="fundo" value="azul"> Azul do iLibras (#4A90E2)</label>
+      <label><input type="radio" name="fundo" value="tailwind"> Tailwind 4, em oklch()</label>
+      <label><input type="radio" name="fundo" value="sistema"> Sem fundo, segue o Windows <small>(troque o modo do Windows para ver)</small></label>
+      <label><input type="radio" name="fundo" value="gradiente"> Gradiente escuro <small>(não dá para ler: use "Escuro" abaixo)</small></label>
+    </fieldset>
+
+    <fieldset id="temas">
+      <legend>Opção <code>tema</code> do widget</legend>
+      <label><input type="radio" name="tema" value="auto" checked> auto (padrão: segue o fundo do site)</label>
+      <label><input type="radio" name="tema" value="claro"> claro (fixo)</label>
+      <label><input type="radio" name="tema" value="escuro"> escuro (fixo)</label>
+    </fieldset>
+
+    <div class="estado" id="estado" aria-live="polite"></div>
+
+    <button type="button" id="abrir">Abrir o formulário</button>
+  </div>
+
+  <main class="site">
+    <h2>Um site qualquer</h2>
+    <p>
+      Este texto faz o papel do conteúdo do site do cliente. O widget lê a cor de
+      fundo desta página e escolhe o tema que aparece melhor sobre ela: no escuro,
+      o ícone fica branco e o formulário fica escuro.
+    </p>
+    <p>
+      Teste também com o formulário aberto: trocar o fundo com ele aberto troca o
+      tema na hora. Clique em "Iniciar atendimento" com um nome completo e o
+      aceite marcado para ver o aviso de redirecionamento e, depois, a mensagem
+      de serviço indisponível.
+    </p>
+  </main>
+
+  <script src="ilibras-widget.js"></script>
+  <script>
+    // Envio simulado: responde 503 para mostrar o aviso de falha e o plano de
+    // contingência no tema atual, sem criar atendimento de verdade.
+    const API_FALSA = 'https://teste.invalid/api/widget';
+    const fetchOriginal = window.fetch;
+    window.fetch = (url, opcoes) => {
+      if (url !== API_FALSA) return fetchOriginal(url, opcoes);
+      return new Promise((resolve) => setTimeout(() => resolve(
+        new Response(JSON.stringify({ message: 'indisponível' }), { status: 503 })
+      ), 600));
+    };
+
+    const widget = new ILibrasWidget({
+      token: 'token-de-teste',
+      apiUrl: API_FALSA,
+      tentativas: 1,
+      fallback: { telefone: '(11) 0000-0000', email: 'contato@exemplo.com.br' }
+    });
+
+    document.getElementById('fundos').addEventListener('change', (e) => {
+      document.documentElement.dataset.fundo = e.target.value;
+    });
+
+    document.getElementById('temas').addEventListener('change', (e) => {
+      widget.definirTema(e.target.value);
+    });
+
+    document.getElementById('abrir').addEventListener('click', () => widget.openWidget());
+
+    const estado = document.getElementById('estado');
+    const sistema = window.matchMedia('(prefers-color-scheme: dark)');
+    setInterval(() => {
+      estado.innerHTML =
+        'Windows em modo: <b>' + (sistema.matches ? 'escuro' : 'claro') + '</b><br>' +
+        'Fundo lido: <b>' + getComputedStyle(document.body).backgroundColor + '</b><br>' +
+        'Tema do widget: <b>' + widget.temaAplicado + '</b>';
+    }, 250);
+  </script>
+</body>
+</html>

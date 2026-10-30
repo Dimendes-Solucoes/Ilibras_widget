@@ -4,6 +4,60 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 ---
 
+## [1.7.0] - 2026-10-29
+
+### 🌙 O widget acompanha o tema do site, e o ícone fica branco no escuro
+
+A logo é azul-marinho sobre fundo transparente: num site escuro, sumia. Agora
+o widget lê o fundo do site e escolhe o tema que aparece melhor sobre ele. No
+escuro, o azul do ícone vira branco — o dourado continua — e o formulário fica
+escuro junto.
+
+Quem decide é o **fundo do site**, não o `prefers-color-scheme` do sistema,
+que era o que ligava o tema escuro do formulário até aqui. O ícone flutua
+sobre a página, e num site claro aberto num computador em modo escuro o tema
+do sistema pintaria o ícone de branco sobre branco. O sistema continua
+contando por tabela: o site que segue o modo escuro do computador escurece o
+próprio fundo, e é esse fundo que se lê.
+
+- O fundo é o do `<html>` com o do `<body>` por cima, transparência incluída.
+  Site sem fundo próprio mostra a tela-base do navegador, que só é escura
+  quando o site declara `color-scheme` escuro (no CSS ou na `<meta>`).
+- A cor é lida por um canvas de 1 pixel, que entende `oklch()` e `lab()` — o
+  formato em que o Tailwind 4, por exemplo, devolve a cor de fundo.
+- O widget acompanha a troca sem recarregar: classe ou `data-*` mudando no
+  `<html>`/`<body>` (o botão de tema do site), o fim da transição do fundo e o
+  sistema trocando de modo.
+- **Mudança de comportamento:** num site claro, quem tem o sistema em modo
+  escuro passa a ver o formulário claro, como o site. Antes via o escuro.
+
+### ⚙️ Nova opção `tema` e novo método `definirTema()`
+
+`tema: 'auto'` é o padrão. `'claro'` e `'escuro'` fixam o tema — para o site
+que pinta o fundo com gradiente, imagem ou num elemento de dentro, que o
+widget não consegue ler. `definirTema('claro' | 'escuro' | 'auto')` troca na
+hora.
+
+### 🩹 Tema escuro
+
+- O campo com foco era pintado de branco, com o texto claro por cima: sumia o
+  que se digitava.
+- **Agendar** e **Voltar** ficavam em 3:1 no fundo escuro; agora passam de 8:1.
+- O placeholder subiu para 4,6:1, e o contorno de foco — inclusive o do ícone,
+  que fica sobre o fundo do site — ficou claro no tema escuro.
+- O container declara `color-scheme` conforme o tema, para campo, checkbox e o
+  X de fechar não herdarem o esquema do site.
+
+### 🧪 Testes
+
+`tests/tema.test.mjs`: ícone branco com o dourado mantido no site escuro,
+ícone azul no site claro com o sistema escuro, `color-scheme` e `<meta>`,
+transparência, o limite de luminância, canvas bloqueado por proteção contra
+fingerprint, `tema` fixo, `definirTema`, releitura na troca de classe e na
+troca do sistema, e `destroy()` desligando a observação.
+
+---
+
 ## [1.6.0] - 2026-09-29
 
 ### 🧭 Avisa antes de levar a pessoa para o iLibras

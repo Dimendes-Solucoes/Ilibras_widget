@@ -15,6 +15,10 @@
 #ilibras-widget-container {
   position: fixed;
   z-index: 9999;
+  /* Campo, checkbox e o X de fechar seguem o tema do widget, e não o
+     color-scheme que o site declarou: num site escuro com o widget claro, o
+     texto digitado sairia branco no campo branco. */
+  color-scheme: light;
 }
 
 /* Posicionamento */
@@ -468,41 +472,7 @@
   outline-offset: 2px;
 }
 
-/* Tema escuro (opcional) */
-@media (prefers-color-scheme: dark) {
-  #ilibras-widget-container .ilibras-widget-modal {
-    background: #1e1e1e;
-  }
-
-  #ilibras-widget-container .ilibras-widget-body {
-    background: #2d2d2d;
-  }
-
-  #ilibras-widget-container .ilibras-widget-message {
-    background: #363636;
-    color: #e0e0e0;
-  }
-
-  #ilibras-widget-container .ilibras-widget-form-group label {
-    color: #b0b0b0;
-  }
-
-  #ilibras-widget-container .ilibras-widget-form-group input[type="text"],
-  #ilibras-widget-container .ilibras-widget-form-group input[type="tel"] {
-    background: #363636;
-    border-color: #4a4a4a;
-    color: #e0e0e0;
-  }
-
-  #ilibras-widget-container .ilibras-widget-form-group input[type="text"]::placeholder,
-  #ilibras-widget-container .ilibras-widget-form-group input[type="tel"]::placeholder {
-    color: #6c6c6c;
-  }
-
-  #ilibras-widget-container .ilibras-widget-checkbox-label {
-    color: #b0b0b0;
-  }
-}
+/* Tema escuro: ver o bloco no fim do arquivo. */
 
 
 /* ─── Acessibilidade e estados ──────────────────────────────────────────────
@@ -692,52 +662,125 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  #ilibras-widget-container .ilibras-widget-legenda,
-  #ilibras-widget-container .ilibras-widget-dica,
-  #ilibras-widget-container .ilibras-widget-status {
-    color: #c9c9c9;
-  }
+/* ─── Tema escuro ────────────────────────────────────────────────────────────
+   Liga pela classe que o script põe no container, e não por
+   prefers-color-scheme: o ícone flutua sobre o site, e o que decide se ele
+   aparece é o fundo do site, não o do sistema. Num site claro aberto num
+   computador em modo escuro, o tema do sistema pintaria o ícone de branco
+   sobre branco. O script lê o fundo do site e acompanha quando ele muda.
+*/
+#ilibras-widget-container.ilibras-widget-tema-escuro {
+  color-scheme: dark;
+}
 
-  #ilibras-widget-container .ilibras-widget-erro {
-    color: #ff9aa2;
-  }
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-modal {
+  background: #1e1e1e;
+  border-color: #3a3a3a;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+}
 
-  #ilibras-widget-container .ilibras-widget-form-group input.ilibras-widget-invalido {
-    border-color: #ff9aa2;
-  }
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-header {
+  background: #1e1e1e;
+  border-left-color: #333;
+  border-bottom-color: #333;
+}
 
-  #ilibras-widget-container .ilibras-widget-aviso {
-    background: #3a2224;
-    border-color: #6b3a3f;
-    border-left-color: #ff9aa2;
-    color: #ffd9dc;
-  }
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-title,
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-confirmacao-titulo {
+  color: #e6f0f8;
+}
 
-  #ilibras-widget-container .ilibras-widget-fallback {
-    border-top-color: #6b3a3f;
-  }
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-close {
+  color: #e0e0e0;
+}
 
-  #ilibras-widget-container .ilibras-widget-fallback a {
-    color: #9ecbff;
-  }
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-body {
+  background: #2d2d2d;
+}
 
-  #ilibras-widget-container .ilibras-widget-title,
-  #ilibras-widget-container .ilibras-widget-confirmacao-titulo {
-    color: #e6f0f8;
-  }
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-message {
+  background: #363636;
+  color: #e0e0e0;
+}
 
-  #ilibras-widget-container .ilibras-widget-confirmacao-texto {
-    color: #c9c9c9;
-  }
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-form-group label,
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-checkbox-label {
+  color: #b0b0b0;
+}
 
-  #ilibras-widget-container .ilibras-widget-header {
-    background: #1e1e1e;
-    border-left-color: #333;
-    border-bottom-color: #333;
-  }
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-form-group input[type="text"],
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-form-group input[type="tel"] {
+  background: #363636;
+  border-color: #4a4a4a;
+  color: #e0e0e0;
+}
 
-  #ilibras-widget-container .ilibras-widget-close {
-    color: #e0e0e0;
-  }
+/* O foco do tema claro pinta o campo de branco, e o texto claro sumia nele. */
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-form-group input[type="text"]:focus,
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-form-group input[type="tel"]:focus {
+  background: #363636;
+  border-color: #9ecbff;
+}
+
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-form-group input[type="text"]::placeholder,
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-form-group input[type="tel"]::placeholder {
+  color: #a0a0a0;
+}
+
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-legenda,
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-dica,
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-status,
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-confirmacao-texto {
+  color: #c9c9c9;
+}
+
+/* Agendar e Voltar: o azul do texto fica em 3:1 no fundo escuro, abaixo dos
+   4,5:1 que texto pede. */
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-agendar {
+  color: #9ecbff;
+  border-color: #4f6f94;
+}
+
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-agendar:hover:not(:disabled) {
+  background: rgba(158, 203, 255, 0.1);
+  border-color: #9ecbff;
+}
+
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-erro {
+  color: #ff9aa2;
+}
+
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-form-group input.ilibras-widget-invalido {
+  border-color: #ff9aa2;
+}
+
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-aviso {
+  background: #3a2224;
+  border-color: #6b3a3f;
+  border-left-color: #ff9aa2;
+  color: #ffd9dc;
+}
+
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-fallback {
+  border-top-color: #6b3a3f;
+}
+
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-fallback a {
+  color: #9ecbff;
+}
+
+/* O contorno de foco azul-escuro some no fundo escuro, inclusive o do ícone,
+   que fica sobre o fundo do site. */
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-button:focus-visible,
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-close:focus-visible,
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-submit:focus-visible,
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-agendar:focus-visible,
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-form-group input:focus-visible,
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-checkbox-label input:focus-visible,
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-fallback a:focus-visible {
+  outline-color: #9ecbff;
+}
+
+#ilibras-widget-container.ilibras-widget-tema-escuro .ilibras-widget-aviso:focus-visible {
+  outline-color: #ff9aa2;
 }

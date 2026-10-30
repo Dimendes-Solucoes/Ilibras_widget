@@ -22,8 +22,18 @@
  * cria o atendimento depois do "sim". Criar antes e perguntar depois deixaria
  * um atendimento órfão na fila de quem desistiu — com o alarme dos
  * intérpretes tocando para ninguém.
+ *
+ * Desde a v1.7.0 o widget acompanha o tema do site, claro ou escuro. Quem
+ * decide é o fundo do site, não o sistema: o ícone flutua sobre a página, e
+ * num site claro aberto num computador em modo escuro um ícone branco sumiria.
  */
 import { CSS, LOGO } from './assets-gerados.js';
+
+// A logo é azul-marinho sobre fundo transparente: num site escuro, some. A
+// versão do tema escuro troca só o azul por branco, e o dourado continua. Sai
+// da mesma string em vez de vir embutida em dobro — seriam 23 KB a mais no
+// arquivo que todo visitante baixa.
+const LOGO_ESCURO = LOGO.replace(/%231c2c4c/gi, '%23ffffff');
 
 const defaultConfig = {
   position: 'bottom-right',
@@ -44,6 +54,11 @@ const defaultConfig = {
   // antes de criar o atendimento. Sair do site em que se estava, para uma aba
   // nova, sem saber antes, desorienta — sobretudo quem usa leitor de tela.
   confirmarRedirecionamento: true,
+
+  // 'auto' lê o fundo do site e acompanha quando ele muda. 'claro' e 'escuro'
+  // fixam o tema — para o site cujo fundo o widget não consegue ler, como um
+  // gradiente ou uma imagem.
+  tema: 'auto',
 
   token: '',
   zIndex: 9999,
@@ -90,6 +105,7 @@ class ILibrasWidget {
   init() {
     this.injectStyles();
     this.createWidget();
+    this.observarTema();
     this.attachEventListeners();
   }
 
@@ -225,6 +241,7 @@ class ILibrasWidget {
 
     this.container = container;
     this.botao = container.querySelector('#ilibras-widget-button');
+    this.logo = this.botao.querySelector('img');
     this.modal = container.querySelector('#ilibras-widget-modal');
     this.form = container.querySelector('#ilibras-widget-form');
     this.submit = container.querySelector('#ilibras-widget-submit');
@@ -349,6 +366,143 @@ class ILibrasWidget {
     } else {
       this.botao.focus();
     }
+  }
+
+  // ─── Tema ───────────────────────────────────────────────────────────────
+  // O ícone flutua sobre o site, então quem decide a cor dele é o fundo do
+  // site. O sistema entra por tabela: o site que segue o modo escuro do
+  // computador escurece o próprio fundo, e é esse fundo que se lê aqui.
+
+  observarTema() {
+    this.aplicarTema();
+
+    // Uma releitura por quadro, por mais mudanças que cheguem juntas.
+    let quadro = null;
+    const reler = () => {
+      if (quadro !== null) return;
+      quadro = requestAnimationFrame(() => {
+        quadro = null;
+        this.aplicarTema();
+      });
+    };
+
+    // O botão de tema do site quase sempre troca uma classe ou um data-* no
+    // <html> ou no <body>.
+    const observador = new MutationObserver(reler);
+    observador.observe(document.documentElement, { attributes: true });
+    observador.observe(document.body, { attributes: true });
+
+    // O sistema trocou de modo: o site pode ter trocado junto.
+    const sistema = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+    if (sistema) sistema.addEventListener('change', reler);
+
+    // Site com transição no fundo: logo depois da troca de classe a cor ainda
+    // é a antiga, e a leitura que vale é a do fim da transição.
+    const fimDaTransicao = (e) => {
+      if (e.target === document.body || e.target === document.documentElement) reler();
+    };
+    document.addEventListener('transitionend', fimDaTransicao);
+
+    // O CSS do site pode terminar de chegar depois do widget.
+    window.addEventListener('load', reler);
+
+    this.pararDeObservarTema = () => {
+      observador.disconnect();
+      if (sistema) sistema.removeEventListener('change', reler);
+      document.removeEventListener('transitionend', fimDaTransicao);
+      window.removeEventListener('load', reler);
+      if (quadro !== null) cancelAnimationFrame(quadro);
+    };
+  }
+
+  /**
+   * Para o site com botão de tema que o widget não percebe sozinho: 'claro' e
+   * 'escuro' fixam o tema; 'auto' volta a ler o fundo do site.
+   */
+  definirTema(tema) {
+    this.config.tema = tema;
+    this.aplicarTema();
+  }
+
+  aplicarTema() {
+    const tema = this.detectarTema();
+    if (tema === this.temaAplicado) return;
+    this.temaAplicado = tema;
+
+    const escuro = tema === 'escuro';
+    this.container.classList.toggle('ilibras-widget-tema-escuro', escuro);
+    this.logo.src = escuro ? LOGO_ESCURO : LOGO;
+  }
+
+  detectarTema() {
+    const { tema } = this.config;
+    if (tema === 'claro' || tema === 'escuro') return tema;
+
+    const cor = this.corDeFundoDaPagina();
+    if (!cor) return 'claro';
+
+    // Luminância relativa, a mesma da conta de contraste da WCAG. Abaixo de
+    // 0,23 o branco contrasta mais com o fundo do que o azul da logo.
+    const linear = (c) => {
+      const v = c / 255;
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    };
+    const [r, g, b] = cor;
+    const luminancia = 0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b);
+
+    return luminancia < 0.23 ? 'escuro' : 'claro';
+  }
+
+  /**
+   * A cor que de fato aparece atrás do widget: a tela-base do navegador com o
+   * fundo do <html> e o do <body> por cima, transparência incluída.
+   *
+   * Quem faz a conta é um canvas de 1 pixel. Ele entende oklch(), lab() e o
+   * que mais o navegador entender — e o navegador devolve a cor no formato em
+   * que o site a escreveu, que nem sempre é rgb().
+   *
+   * @returns {number[]|null} [r, g, b], ou null quando não dá para ler
+   */
+  corDeFundoDaPagina() {
+    const tela = document.createElement('canvas');
+    tela.width = 1;
+    tela.height = 1;
+    const ctx = tela.getContext('2d', { willReadFrequently: true });
+    if (!ctx) return null;
+
+    ctx.fillStyle = this.telaBaseEscura() ? '#121212' : '#ffffff';
+    ctx.fillRect(0, 0, 1, 1);
+
+    for (const el of [document.documentElement, document.body]) {
+      // Cor que o canvas não entende é ignorada, e ele repintaria a anterior.
+      ctx.fillStyle = 'transparent';
+      ctx.fillStyle = getComputedStyle(el).backgroundColor;
+      ctx.fillRect(0, 0, 1, 1);
+    }
+
+    const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+
+    // A base é opaca, então o pixel também é. Se não veio opaco, quem
+    // respondeu foi a proteção contra fingerprint do navegador, não a página.
+    return a === 255 ? [r, g, b] : null;
+  }
+
+  /**
+   * Sem fundo próprio, o site mostra a tela-base do navegador: branca, salvo
+   * quando o site declara color-scheme escuro, no CSS ou na <meta>.
+   */
+  telaBaseEscura() {
+    let esquema = getComputedStyle(document.documentElement).colorScheme || '';
+    if (esquema === '' || esquema === 'normal') {
+      const meta = document.querySelector('meta[name="color-scheme"]');
+      esquema = meta ? meta.content : '';
+    }
+
+    if (!/\bdark\b/.test(esquema)) return false;
+
+    // Só "dark": escura sempre. "light dark": a que o sistema preferir.
+    return !/\blight\b/.test(esquema)
+      || Boolean(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
   }
 
   // ─── Validação ──────────────────────────────────────────────────────────
@@ -874,6 +1028,7 @@ class ILibrasWidget {
   }
 
   destroy() {
+    if (this.pararDeObservarTema) this.pararDeObservarTema();
     if (this.container) this.container.remove();
     const styles = document.getElementById('ilibras-widget-styles');
     if (styles) styles.remove();
